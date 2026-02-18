@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly Tracker App</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#111827">
+
+<style>
+:root {
+    --bg: #f4f5f7;
+    --card: #ffffff;
+    --border: #e5e7eb;
+    --primary: #111827;
+    --success: #16a34a;
+    --fail: #dc2626;
+    --muted: #6b7280;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+    background: var(--bg);
+    padding: 20px;
+}
+
+.container {
+    max-width: 700px;
+    margin: auto;
+}
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+h1 {
+    text-align: center;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    margin-bottom: 12px;
+}
+
+.days-selector {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.week {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.day {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+}
+
+.task {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+.task.done span {
+    text-decoration: line-through;
+    color: var(--success);
+}
+
+.task.failed span {
+    text-decoration: line-through;
+    color: var(--fail);
+}
+
+.task button {
+    padding: 4px 8px;
+    font-size: 11px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+canvas {
+    display: block;
+    margin: auto;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Weekly Tracker</h1>
+
+    <div class="card">
+        <input type="text" id="taskInput" placeholder="Nueva tarea">
+
+        <div class="days-selector">
+            <label><input type="checkbox" value="monday"> Lunes</label>
+            <label><input type="checkbox" value="tuesday"> Martes</label>
+            <label><input type="checkbox" value="wednesday"> Miércoles</label>
+            <label><input type="checkbox" value="thursday"> Jueves</label>
+            <label><input type="checkbox" value="friday"> Viernes</label>
+            <label><input type="checkbox" value="saturday"> Sábado</label>
+            <label><input type="checkbox" value="sunday"> Domingo</label>
+        </div>
+
+        <button id="addTaskBtn">Agregar tarea</button>
+    </div>
+
+    <div class="card">
+        <div class="week" id="weekContainer"></div>
+    </div>
+
+    <div class="card">
+        <h3 style="text-align:center;margin-bottom:10px;">Rendimiento</h3>
+        <canvas id="statsChart" width="300" height="300"></canvas>
+    </div>
+</div>
+
+<script>
+// REGISTRO SERVICE WORKER
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js');
+}
+
+class App {
+    constructor() {
+        this.tasks = JSON.parse(localStorage.getItem('appTasks')) || {
+            monday: [], tuesday: [], wednesday: [],
+            thursday: [], friday: [], saturday: [], sunday: []
+        };
+
+        this.labels = {
+            monday:"Lunes", tuesday:"Martes", wednesday:"Miércoles",
+            thursday:"Jueves", friday:"Viernes",
+            saturday:"Sábado", sunday:"Domingo"
+        };
+
+        document.getElementById('addTaskBtn')
+            .addEventListener('click', () => this.addTask());
+
+        this.render();
+    }
+
+    save() {
+        localStorage.setItem('appTasks', JSON.stringify(this.tasks));
+    }
+
+    addTask() {
+        const input = document.getElementById('taskInput');
+        const text = input.value.trim();
+        if (!text) return;
+
+        const selected = document.querySelectorAll('.days-selector input:checked');
+        if (selected.length === 0) return;
+
+        selected.forEach(cb => {
+            this.tasks[cb.value].push({
+                id: Date.now()+Math.random(),
+                text,
+                status:"pending"
+            });
+            cb.checked=false;
+        });
+
+        input.value="";
+        this.save();
+        this.render();
+    }
+
+    setStatus(day,id,status){
+        const task=this.tasks[day].find(t=>t.id===id);
+        if(!task)return;
+        task.status = task.status===status ? "pending" : status;
+        this.save();
+        this.render();
+    }
+
+    deleteTask(day,id){
+        this.tasks[day]=this.tasks[day].filter(t=>t.id!==id);
+        this.save();
+        this.render();
+    }
+
+    stats(){
+        let done=0, failed=0;
+        Object.values(this.tasks).forEach(d=>{
+            d.forEach(t=>{
+                if(t.status==="done")done++;
+                if(t.status==="failed")failed++;
+            });
+        });
+        return {done,failed};
+    }
+
+    drawChart(){
+        const canvas=document.getElementById('statsChart');
+        const ctx=canvas.getContext('2d');
+        ctx.clearRect(0,0,300,300);
+
+        const {done,failed}=this.stats();
+        const total=done+failed;
+        if(total===0)return;
+
+        const doneAngle=(done/total)*Math.PI*2;
+
+        ctx.beginPath();
+        ctx.moveTo(150,150);
+        ctx.arc(150,150,100,0,doneAngle);
+        ctx.fillStyle="#16a34a";
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(150,150);
+        ctx.arc(150,150,100,doneAngle,Math.PI*2);
+        ctx.fillStyle="#dc2626";
+        ctx.fill();
+    }
+
+    render(){
+        const container=document.getElementById('weekContainer');
+        container.innerHTML='';
+
+        Object.keys(this.tasks).forEach(day=>{
+            const div=document.createElement('div');
+            div.className='day';
+            div.innerHTML=`<h3>${this.labels[day]}</h3>`;
+
+            this.tasks[day].forEach(task=>{
+                const t=document.createElement('div');
+                t.className='task';
+                if(task.status==="done")t.classList.add('done');
+                if(task.status==="failed")t.classList.add('failed');
+
+                t.innerHTML=`
+                    <input type="checkbox" ${task.status==="done"?"checked":""}>
+                    <input type="checkbox" ${task.status==="failed"?"checked":""}>
+                    <span>${task.text}</span>
+                    <button>Eliminar</button>
+                `;
+
+                const checks=t.querySelectorAll('input');
+                checks[0].addEventListener('change',()=>this.setStatus(day,task.id,"done"));
+                checks[1].addEventListener('change',()=>this.setStatus(day,task.id,"failed"));
+                t.querySelector('button')
+                    .addEventListener('click',()=>this.deleteTask(day,task.id));
+
+                div.appendChild(t);
+            });
+
+            container.appendChild(div);
+        });
+
+        this.drawChart();
+    }
+}
+
+new App();
+</script>
+
+</body>
+</html>
