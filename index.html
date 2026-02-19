@@ -10,289 +10,422 @@
 
 <style>
 :root {
-    --bg: #f4f5f7;
-    --card: #ffffff;
-    --border: #e5e7eb;
-    --primary: #111827;
-    --success: #16a34a;
-    --fail: #dc2626;
-    --muted: #6b7280;
+    --bg:#f4f5f7;
+    --card:#ffffff;
+    --border:#e5e7eb;
+    --primary:#111827;
+    --success:#16a34a;
+    --fail:#dc2626;
+    --text:#111827;
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+body.dark{
+    --bg:#0f172a;
+    --card:#1e293b;
+    --border:#334155;
+    --primary:#f1f5f9;
+    --text:#f1f5f9;
 }
 
-body {
-    background: var(--bg);
-    padding: 20px;
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
 }
 
-.container {
-    max-width: 700px;
-    margin: auto;
+body{
+    background:var(--bg);
+    padding:20px;
+    color:var(--text);
+    transition:all 0.3s ease;
 }
 
-.card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 20px;
+.container{max-width:700px;margin:auto;}
+
+.card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:20px;
+    margin-bottom:20px;
+    transition:all 0.3s ease;
 }
 
-h1 {
-    text-align: center;
-    font-weight: 500;
-    margin-bottom: 20px;
+.card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 10px 25px rgba(0,0,0,0.08);
 }
 
-input[type="text"] {
-    width: 100%;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    margin-bottom: 12px;
+h1{
+    text-align:center;
+    margin-bottom:15px;
+    font-weight:500;
 }
 
-.days-selector {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    font-size: 13px;
-    margin-bottom: 12px;
+.top-bar{
+    display:flex;
+    justify-content:flex-end;
+    margin-bottom:10px;
 }
 
-button {
-    width: 100%;
-    padding: 10px;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
+.toggle-dark{
+    width:auto;
+    padding:6px 12px;
+    font-size:12px;
 }
 
-.week {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+.week-nav{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
 }
 
-.day {
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px;
+.week-nav button{
+    width:auto;
+    padding:6px 14px;
+    font-size:12px;
 }
 
-.task {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    margin-bottom: 6px;
+button{
+    width:100%;
+    padding:10px;
+    background:var(--primary);
+    color:var(--bg);
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    transition:all 0.2s ease;
 }
 
-.task.done span {
-    text-decoration: line-through;
-    color: var(--success);
+button:hover{transform:scale(1.03);}
+button:active{transform:scale(0.95);}
+
+input[type="text"]{
+    width:100%;
+    padding:10px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    margin-bottom:12px;
+    background:transparent;
+    color:var(--text);
 }
 
-.task.failed span {
-    text-decoration: line-through;
-    color: var(--fail);
+.days-selector{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+    font-size:13px;
+    margin-bottom:12px;
 }
 
-.task button {
-    padding: 4px 8px;
-    font-size: 11px;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    cursor: pointer;
+.week{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    transition:opacity 0.2s ease;
 }
 
-canvas {
-    display: block;
-    margin: auto;
+.day{
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:12px;
+}
+
+.task{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:13px;
+    margin-bottom:6px;
+}
+
+.task.done span{
+    text-decoration:line-through;
+    color:var(--success);
+}
+
+.task.failed span{
+    text-decoration:line-through;
+    color:var(--fail);
+}
+
+.task button{
+    padding:4px 8px;
+    font-size:11px;
+    background:transparent;
+    border:1px solid var(--border);
+    border-radius:6px;
+}
+
+.chart-wrapper{
+    position:relative;
+    width:300px;
+    margin:auto;
+}
+
+canvas{
+    display:block;
+}
+
+.percentage{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    font-size:28px;
+    font-weight:600;
 }
 </style>
 </head>
 
 <body>
-
 <div class="container">
-    <h1>Weekly Tracker</h1>
 
-    <div class="card">
-        <input type="text" id="taskInput" placeholder="Nueva tarea">
+<h1>Weekly Tracker</h1>
 
-        <div class="days-selector">
-            <label><input type="checkbox" value="monday"> Lunes</label>
-            <label><input type="checkbox" value="tuesday"> Martes</label>
-            <label><input type="checkbox" value="wednesday"> Miércoles</label>
-            <label><input type="checkbox" value="thursday"> Jueves</label>
-            <label><input type="checkbox" value="friday"> Viernes</label>
-            <label><input type="checkbox" value="saturday"> Sábado</label>
-            <label><input type="checkbox" value="sunday"> Domingo</label>
-        </div>
+<div class="top-bar">
+<button class="toggle-dark" onclick="app.toggleDark()">🌙 Modo oscuro</button>
+</div>
 
-        <button id="addTaskBtn">Agregar tarea</button>
-    </div>
+<div class="card">
+<input type="text" id="taskInput" placeholder="Nueva tarea">
+<div class="days-selector">
+<label><input type="checkbox" value="monday"> Lunes</label>
+<label><input type="checkbox" value="tuesday"> Martes</label>
+<label><input type="checkbox" value="wednesday"> Miércoles</label>
+<label><input type="checkbox" value="thursday"> Jueves</label>
+<label><input type="checkbox" value="friday"> Viernes</label>
+<label><input type="checkbox" value="saturday"> Sábado</label>
+<label><input type="checkbox" value="sunday"> Domingo</label>
+</div>
+<button id="addTaskBtn">Agregar tarea</button>
+</div>
 
-    <div class="card">
-        <div class="week" id="weekContainer"></div>
-    </div>
+<div class="card">
+<div class="week-nav">
+<button onclick="app.changeWeek(-1)">Anterior</button>
+<span id="weekLabel"></span>
+<button onclick="app.changeWeek(1)">Siguiente</button>
+</div>
+<div class="week" id="weekContainer"></div>
+</div>
 
-    <div class="card">
-        <h3 style="text-align:center;margin-bottom:10px;">Rendimiento</h3>
-        <canvas id="statsChart" width="300" height="300"></canvas>
-    </div>
+<div class="card">
+<h3 style="text-align:center;margin-bottom:10px;">Rendimiento semanal</h3>
+<div class="chart-wrapper">
+<canvas id="statsChart" width="300" height="300"></canvas>
+<div class="percentage" id="percentage">0%</div>
+</div>
+</div>
+
 </div>
 
 <script>
-// REGISTRO SERVICE WORKER
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('service-worker.js');
 }
 
-class App {
-    constructor() {
-        this.tasks = JSON.parse(localStorage.getItem('appTasks')) || {
-            monday: [], tuesday: [], wednesday: [],
-            thursday: [], friday: [], saturday: [], sunday: []
-        };
+class App{
+constructor(){
+this.habits=JSON.parse(localStorage.getItem('habits'))||[];
+this.weeklyProgress=JSON.parse(localStorage.getItem('weeklyProgress'))||{};
+this.darkMode=localStorage.getItem('darkMode')==="true";
+this.currentDate=new Date();
 
-        this.labels = {
-            monday:"Lunes", tuesday:"Martes", wednesday:"Miércoles",
-            thursday:"Jueves", friday:"Viernes",
-            saturday:"Sábado", sunday:"Domingo"
-        };
+if(this.darkMode) document.body.classList.add('dark');
 
-        document.getElementById('addTaskBtn')
-            .addEventListener('click', () => this.addTask());
+this.labels={
+monday:"Lunes",tuesday:"Martes",wednesday:"Miércoles",
+thursday:"Jueves",friday:"Viernes",
+saturday:"Sábado",sunday:"Domingo"
+};
 
-        this.render();
-    }
-
-    save() {
-        localStorage.setItem('appTasks', JSON.stringify(this.tasks));
-    }
-
-    addTask() {
-        const input = document.getElementById('taskInput');
-        const text = input.value.trim();
-        if (!text) return;
-
-        const selected = document.querySelectorAll('.days-selector input:checked');
-        if (selected.length === 0) return;
-
-        selected.forEach(cb => {
-            this.tasks[cb.value].push({
-                id: Date.now()+Math.random(),
-                text,
-                status:"pending"
-            });
-            cb.checked=false;
-        });
-
-        input.value="";
-        this.save();
-        this.render();
-    }
-
-    setStatus(day,id,status){
-        const task=this.tasks[day].find(t=>t.id===id);
-        if(!task)return;
-        task.status = task.status===status ? "pending" : status;
-        this.save();
-        this.render();
-    }
-
-    deleteTask(day,id){
-        this.tasks[day]=this.tasks[day].filter(t=>t.id!==id);
-        this.save();
-        this.render();
-    }
-
-    stats(){
-        let done=0, failed=0;
-        Object.values(this.tasks).forEach(d=>{
-            d.forEach(t=>{
-                if(t.status==="done")done++;
-                if(t.status==="failed")failed++;
-            });
-        });
-        return {done,failed};
-    }
-
-    drawChart(){
-        const canvas=document.getElementById('statsChart');
-        const ctx=canvas.getContext('2d');
-        ctx.clearRect(0,0,300,300);
-
-        const {done,failed}=this.stats();
-        const total=done+failed;
-        if(total===0)return;
-
-        const doneAngle=(done/total)*Math.PI*2;
-
-        ctx.beginPath();
-        ctx.moveTo(150,150);
-        ctx.arc(150,150,100,0,doneAngle);
-        ctx.fillStyle="#16a34a";
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.moveTo(150,150);
-        ctx.arc(150,150,100,doneAngle,Math.PI*2);
-        ctx.fillStyle="#dc2626";
-        ctx.fill();
-    }
-
-    render(){
-        const container=document.getElementById('weekContainer');
-        container.innerHTML='';
-
-        Object.keys(this.tasks).forEach(day=>{
-            const div=document.createElement('div');
-            div.className='day';
-            div.innerHTML=`<h3>${this.labels[day]}</h3>`;
-
-            this.tasks[day].forEach(task=>{
-                const t=document.createElement('div');
-                t.className='task';
-                if(task.status==="done")t.classList.add('done');
-                if(task.status==="failed")t.classList.add('failed');
-
-                t.innerHTML=`
-                    <input type="checkbox" ${task.status==="done"?"checked":""}>
-                    <input type="checkbox" ${task.status==="failed"?"checked":""}>
-                    <span>${task.text}</span>
-                    <button>Eliminar</button>
-                `;
-
-                const checks=t.querySelectorAll('input');
-                checks[0].addEventListener('change',()=>this.setStatus(day,task.id,"done"));
-                checks[1].addEventListener('change',()=>this.setStatus(day,task.id,"failed"));
-                t.querySelector('button')
-                    .addEventListener('click',()=>this.deleteTask(day,task.id));
-
-                div.appendChild(t);
-            });
-
-            container.appendChild(div);
-        });
-
-        this.drawChart();
-    }
+document.getElementById('addTaskBtn').addEventListener('click',()=>this.addHabit());
+this.render();
 }
 
-new App();
-</script>
+toggleDark(){
+document.body.classList.toggle('dark');
+this.darkMode=!this.darkMode;
+localStorage.setItem('darkMode',this.darkMode);
+}
 
+getISOWeek(date){
+const temp=new Date(date);
+temp.setDate(temp.getDate()+3-(temp.getDay()+6)%7);
+const week1=new Date(temp.getFullYear(),0,4);
+return 1+Math.round(((temp-week1)/86400000-3+(week1.getDay()+6)%7)/7);
+}
+
+getWeekKey(date){
+return `${date.getFullYear()}-W${String(this.getISOWeek(date)).padStart(2,'0')}`;
+}
+
+getWeekStart(date){
+const d=new Date(date);
+const day=d.getDay();
+const diff=d.getDate()-((day+6)%7);
+return new Date(d.setDate(diff));
+}
+
+changeWeek(offset){
+this.currentDate.setDate(this.currentDate.getDate()+offset*7);
+this.render();
+}
+
+save(){
+localStorage.setItem('habits',JSON.stringify(this.habits));
+localStorage.setItem('weeklyProgress',JSON.stringify(this.weeklyProgress));
+}
+
+addHabit(){
+const input=document.getElementById('taskInput');
+const text=input.value.trim();
+if(!text)return;
+const selected=document.querySelectorAll('.days-selector input:checked');
+if(selected.length===0)return;
+const id=Date.now().toString();
+const days=[...selected].map(cb=>cb.value);
+this.habits.push({id,text,days,deletedFrom:null});
+selected.forEach(cb=>cb.checked=false);
+input.value="";
+this.save();
+this.render();
+}
+
+deleteHabitFromNow(id){
+const weekKey=this.getWeekKey(this.currentDate);
+const habit=this.habits.find(h=>h.id===id);
+if(!habit)return;
+habit.deletedFrom=weekKey;
+this.save();
+this.render();
+}
+
+setStatus(habitId,day,status){
+const weekKey=this.getWeekKey(this.currentDate);
+if(!this.weeklyProgress[weekKey])this.weeklyProgress[weekKey]={};
+if(!this.weeklyProgress[weekKey][habitId])this.weeklyProgress[weekKey][habitId]={};
+this.weeklyProgress[weekKey][habitId][day]=status;
+this.save();
+this.render();
+}
+
+getStatus(habitId,day){
+const weekKey=this.getWeekKey(this.currentDate);
+return this.weeklyProgress?.[weekKey]?.[habitId]?.[day]||"pending";
+}
+
+isHabitVisible(habit){
+const currentWeek=this.getWeekKey(this.currentDate);
+if(!habit.deletedFrom)return true;
+return currentWeek<habit.deletedFrom;
+}
+
+stats(){
+let done=0,failed=0;
+const weekKey=this.getWeekKey(this.currentDate);
+const weekData=this.weeklyProgress[weekKey]||{};
+Object.values(weekData).forEach(days=>{
+Object.values(days).forEach(status=>{
+if(status==="done")done++;
+if(status==="failed")failed++;
+});
+});
+return{done,failed};
+}
+
+animatePercentage(target){
+const el=document.getElementById('percentage');
+let current=0;
+const step=()=>{
+if(current<=target){
+el.innerText=current+"%";
+current++;
+requestAnimationFrame(step);
+}
+};
+step();
+}
+
+drawChart(){
+const canvas=document.getElementById('statsChart');
+const ctx=canvas.getContext('2d');
+ctx.clearRect(0,0,300,300);
+
+const{done,failed}=this.stats();
+const total=done+failed;
+if(total===0){
+this.animatePercentage(0);
+return;
+}
+
+const percent=Math.round((done/total)*100);
+this.animatePercentage(percent);
+
+const doneAngle=(done/total)*Math.PI*2;
+
+ctx.beginPath();
+ctx.moveTo(150,150);
+ctx.arc(150,150,100,0,doneAngle);
+ctx.fillStyle="#16a34a";
+ctx.fill();
+
+ctx.beginPath();
+ctx.moveTo(150,150);
+ctx.arc(150,150,100,doneAngle,Math.PI*2);
+ctx.fillStyle="#dc2626";
+ctx.fill();
+}
+
+render(){
+const weekStart=this.getWeekStart(this.currentDate);
+const weekEnd=new Date(weekStart);weekEnd.setDate(weekStart.getDate()+6);
+document.getElementById('weekLabel').innerText=
+`${weekStart.toLocaleDateString()} - ${weekEnd.toLocaleDateString()}`;
+
+const container=document.getElementById('weekContainer');
+container.innerHTML='';
+
+Object.keys(this.labels).forEach(day=>{
+const div=document.createElement('div');
+div.className='day';
+div.innerHTML=`<h3>${this.labels[day]}</h3>`;
+
+this.habits.filter(h=>h.days.includes(day)&&this.isHabitVisible(h))
+.forEach(habit=>{
+const status=this.getStatus(habit.id,day);
+const t=document.createElement('div');
+t.className='task';
+if(status==="done")t.classList.add('done');
+if(status==="failed")t.classList.add('failed');
+
+t.innerHTML=`
+<input type="checkbox" ${status==="done"?"checked":""}>
+<input type="checkbox" ${status==="failed"?"checked":""}>
+<span>${habit.text}</span>
+<button>Eliminar</button>
+`;
+
+const checks=t.querySelectorAll('input');
+checks[0].addEventListener('change',()=>this.setStatus(habit.id,day,"done"));
+checks[1].addEventListener('change',()=>this.setStatus(habit.id,day,"failed"));
+t.querySelector('button').addEventListener('click',()=>this.deleteHabitFromNow(habit.id));
+
+div.appendChild(t);
+});
+
+container.appendChild(div);
+});
+
+this.drawChart();
+}
+}
+
+const app=new App();
+</script>
 </body>
 </html>
+
