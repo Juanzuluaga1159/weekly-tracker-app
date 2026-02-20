@@ -5,191 +5,244 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>Weekly Tracker</title>
 
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0f172a">
-
 <style>
 :root{
-    --bg: linear-gradient(160deg,#0f172a,#1e293b);
-    --card: rgba(255,255,255,0.07);
-    --border: rgba(255,255,255,0.12);
-    --primary:#6366f1;
-    --success:#22c55e;
-    --fail:#ef4444;
-    --text:#f1f5f9;
-}
-
-html,body{
-    margin:0;
-    padding:0;
-    width:100%;
-    overflow-x:hidden;
-    -webkit-text-size-adjust:100%;
+--bg:linear-gradient(160deg,#0f172a,#1e293b);
+--card:rgba(255,255,255,0.07);
+--border:rgba(255,255,255,0.12);
+--primary:#6366f1;
+--success:#22c55e;
+--fail:#ef4444;
+--text:#f1f5f9;
 }
 
 *{
-    box-sizing:border-box;
-    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+box-sizing:border-box;
+font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
 }
 
 body{
-    background:var(--bg);
-    padding:16px;
-    padding-top:calc(16px + env(safe-area-inset-top));
-    padding-bottom:calc(20px + env(safe-area-inset-bottom));
-    color:var(--text);
+margin:0;
+background:var(--bg);
+padding:16px;
+color:var(--text);
 }
 
-input,button{ font-size:16px; }
-
 .container{
-    width:100%;
-    max-width:460px;
-    margin:auto;
+max-width:480px;
+margin:auto;
 }
 
 h1{
-    text-align:center;
-    margin-bottom:20px;
-    font-weight:600;
+text-align:center;
+margin-bottom:20px;
+font-weight:600;
 }
 
 .card{
-    background:var(--card);
-    border:1px solid var(--border);
-    border-radius:20px;
-    padding:18px;
-    margin-bottom:18px;
-    backdrop-filter:blur(12px);
-    box-shadow:0 15px 35px rgba(0,0,0,0.3);
-    animation:fadeIn 0.4s ease;
+background:var(--card);
+border:1px solid var(--border);
+border-radius:20px;
+padding:18px;
+margin-bottom:18px;
+backdrop-filter:blur(12px);
+box-shadow:0 10px 30px rgba(0,0,0,0.3);
 }
 
-@keyframes fadeIn{
-    from{opacity:0; transform:translateY(8px);}
-    to{opacity:1; transform:translateY(0);}
-}
-
+/* INPUT TEXTO */
 input[type="text"]{
-    width:100%;
-    padding:14px;
-    border-radius:14px;
-    border:1px solid var(--border);
-    background:rgba(255,255,255,0.05);
-    color:var(--text);
-    margin-bottom:18px;
+width:100%;
+padding:14px;
+border-radius:14px;
+border:1px solid var(--border);
+background:rgba(255,255,255,0.05);
+color:var(--text);
+margin-bottom:14px;
 }
 
+/* ===== TIME PICKER CUSTOM ===== */
+
+.time-display{
+width:100%;
+padding:16px;
+border-radius:16px;
+border:1px solid rgba(99,102,241,.3);
+background:rgba(255,255,255,0.05);
+text-align:center;
+cursor:pointer;
+transition:.2s;
+margin-bottom:18px;
+}
+
+.time-display:hover{
+border-color:#8b5cf6;
+}
+
+.time-modal{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.6);
+display:none;
+align-items:flex-end;
+justify-content:center;
+z-index:999;
+}
+
+.time-picker{
+width:100%;
+max-width:480px;
+background:#1e293b;
+border-radius:20px 20px 0 0;
+padding:20px;
+animation:slideUp .25s ease;
+}
+
+@keyframes slideUp{
+from{transform:translateY(100%);}
+to{transform:translateY(0);}
+}
+
+.time-columns{
+display:flex;
+gap:20px;
+height:220px;
+margin-bottom:16px;
+}
+
+.time-column{
+flex:1;
+overflow-y:auto;
+text-align:center;
+}
+
+.time-item{
+padding:10px;
+border-radius:10px;
+cursor:pointer;
+transition:.2s;
+}
+
+.time-item:hover{
+background:rgba(99,102,241,.2);
+}
+
+.time-item.active{
+background:rgba(99,102,241,.4);
+font-weight:bold;
+}
+
+/* DIAS */
 .days-selector{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
-    margin-bottom:18px;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-bottom:18px;
 }
 
-.days-selector label{
-    display:flex;
-    align-items:center;
-    gap:8px;
-}
-
+/* BOTONES */
 button{
-    width:100%;
-    padding:14px;
-    border:none;
-    border-radius:14px;
-    background:var(--primary);
-    color:white;
-    cursor:pointer;
-    transition:0.2s;
+width:100%;
+padding:14px;
+border:none;
+border-radius:14px;
+background:linear-gradient(90deg,#6366f1,#8b5cf6);
+color:white;
+cursor:pointer;
+transition:.2s;
 }
 
-button:active{ transform:scale(0.97); }
+button:active{ transform:scale(.97); }
 
+/* SEMANA */
 .week-nav{
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-    margin-bottom:16px;
+display:flex;
+flex-direction:column;
+gap:12px;
+margin-bottom:16px;
 }
 
 .week-nav-top{
-    display:flex;
-    gap:12px;
+display:flex;
+gap:12px;
 }
 
 .week-nav-top button{
-    flex:1;
-    background:rgba(255,255,255,0.1);
-    border:1px solid var(--border);
+flex:1;
+background:rgba(255,255,255,0.08);
+border:1px solid var(--border);
 }
 
-.week-nav span{
-    text-align:center;
-    font-size:14px;
+.week-label{
+text-align:center;
+font-size:14px;
+opacity:.8;
 }
 
+/* DIAS */
 .week{
-    display:flex;
-    flex-direction:column;
-    gap:14px;
+display:flex;
+flex-direction:column;
+gap:14px;
 }
 
 .day{
-    border:1px solid var(--border);
-    border-radius:16px;
-    padding:14px;
-    background:rgba(255,255,255,0.04);
+border:1px solid var(--border);
+border-radius:16px;
+padding:14px;
+background:rgba(255,255,255,0.04);
 }
 
-.day h3{ margin-bottom:10px; }
+.day h3{
+margin-bottom:10px;
+}
 
+/* TAREA */
 .task{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    margin-bottom:8px;
-    transition:0.2s;
+display:flex;
+align-items:center;
+gap:8px;
+margin-bottom:8px;
 }
 
-.task:hover{ transform:translateX(2px); }
-
-.task span{ flex:1; }
-
-.task.done span{
-    text-decoration:line-through;
-    color:var(--success);
+.task span{
+flex:1;
 }
 
-.task.failed span{
-    text-decoration:line-through;
-    color:var(--fail);
+.time-badge{
+font-size:11px;
+padding:4px 8px;
+border-radius:20px;
+background:rgba(99,102,241,.25);
+border:1px solid rgba(99,102,241,.4);
 }
 
-.task button{
-    background:transparent;
-    border:1px solid var(--border);
-    padding:4px 8px;
-    font-size:12px;
-    border-radius:8px;
+.delete-btn{
+background:transparent;
+border:1px solid var(--border);
+padding:4px 8px;
+border-radius:8px;
+font-size:12px;
+cursor:pointer;
 }
 
+/* GRAFICO */
 .chart-wrapper{
-    position:relative;
-    width:100%;
-    max-width:240px;
-    margin:auto;
+position:relative;
+width:200px;
+margin:auto;
 }
 
-canvas{ width:100%; }
+canvas{
+width:100%;
+}
 
 .percentage{
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    font-size:22px;
-    font-weight:600;
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+font-weight:bold;
+font-size:18px;
 }
 </style>
 </head>
@@ -201,6 +254,8 @@ canvas{ width:100%; }
 
 <div class="card">
 <input type="text" id="taskInput" placeholder="Nueva tarea">
+
+<div class="time-display" id="timeDisplay">Seleccionar horario</div>
 
 <div class="days-selector">
 <label><input type="checkbox" value="monday"> Lunes</label>
@@ -221,14 +276,12 @@ canvas{ width:100%; }
 <button onclick="app.changeWeek(-1)">Anterior</button>
 <button onclick="app.changeWeek(1)">Siguiente</button>
 </div>
-<span id="weekLabel"></span>
+<div class="week-label" id="weekLabel"></div>
 </div>
-
 <div class="week" id="weekContainer"></div>
 </div>
 
 <div class="card">
-<h3 style="text-align:center;margin-bottom:16px;">Rendimiento semanal</h3>
 <div class="chart-wrapper">
 <canvas id="statsChart"></canvas>
 <div class="percentage" id="percentage">0%</div>
@@ -237,11 +290,22 @@ canvas{ width:100%; }
 
 </div>
 
+<!-- MODAL -->
+<div class="time-modal" id="timeModal">
+<div class="time-picker">
+<div class="time-columns">
+<div class="time-column" id="hoursColumn"></div>
+<div class="time-column" id="minutesColumn"></div>
+</div>
+<button id="confirmTimeBtn">Confirmar</button>
+</div>
+</div>
+
 <script>
 class App{
 constructor(){
 this.habits=JSON.parse(localStorage.getItem("habits"))||[];
-this.weeklyProgress=JSON.parse(localStorage.getItem("weeklyProgress"))||{};
+this.progress=JSON.parse(localStorage.getItem("progress"))||{};
 this.currentDate=new Date();
 
 this.labels={
@@ -250,10 +314,63 @@ thursday:"Jueves",friday:"Viernes",
 saturday:"Sábado",sunday:"Domingo"
 };
 
+this.selectedHour="";
+this.selectedMinute="";
+this.initTimePicker();
+
 document.getElementById("addTaskBtn")
 .addEventListener("click",()=>this.addHabit());
 
 this.render();
+}
+
+initTimePicker(){
+const modal=document.getElementById("timeModal");
+const display=document.getElementById("timeDisplay");
+const hoursCol=document.getElementById("hoursColumn");
+const minutesCol=document.getElementById("minutesColumn");
+
+for(let h=0;h<24;h++){
+const hh=h.toString().padStart(2,"0");
+hoursCol.innerHTML+=`<div class="time-item" data-hour="${hh}">${hh}</div>`;
+}
+
+for(let m=0;m<60;m++){
+const mm=m.toString().padStart(2,"0");
+minutesCol.innerHTML+=`<div class="time-item" data-minute="${mm}">${mm}</div>`;
+}
+
+display.addEventListener("click",()=>{
+modal.style.display="flex";
+});
+
+modal.addEventListener("click",(e)=>{
+if(e.target===modal) modal.style.display="none";
+});
+
+hoursCol.addEventListener("click",(e)=>{
+if(e.target.classList.contains("time-item")){
+hoursCol.querySelectorAll(".time-item").forEach(i=>i.classList.remove("active"));
+e.target.classList.add("active");
+this.selectedHour=e.target.dataset.hour;
+}
+});
+
+minutesCol.addEventListener("click",(e)=>{
+if(e.target.classList.contains("time-item")){
+minutesCol.querySelectorAll(".time-item").forEach(i=>i.classList.remove("active"));
+e.target.classList.add("active");
+this.selectedMinute=e.target.dataset.minute;
+}
+});
+
+document.getElementById("confirmTimeBtn")
+.addEventListener("click",()=>{
+if(this.selectedHour!=="" && this.selectedMinute!==""){
+display.innerText=`${this.selectedHour}:${this.selectedMinute}`;
+}
+modal.style.display="none";
+});
 }
 
 getWeekStart(date){
@@ -263,8 +380,8 @@ const diff=d.getDate()-((day+6)%7);
 return new Date(d.setDate(diff));
 }
 
-getWeekKey(date){
-return this.getWeekStart(date).toDateString();
+getWeekKey(){
+return this.getWeekStart(this.currentDate).toDateString();
 }
 
 changeWeek(offset){
@@ -274,120 +391,64 @@ this.render();
 
 save(){
 localStorage.setItem("habits",JSON.stringify(this.habits));
-localStorage.setItem("weeklyProgress",JSON.stringify(this.weeklyProgress));
+localStorage.setItem("progress",JSON.stringify(this.progress));
 }
 
 addHabit(){
-const input=document.getElementById("taskInput");
-const text=input.value.trim();
+const text=document.getElementById("taskInput").value.trim();
 if(!text)return;
 
-const selected=document.querySelectorAll(".days-selector input:checked");
+const time=this.selectedHour && this.selectedMinute
+? `${this.selectedHour}:${this.selectedMinute}`
+: "";
+
+const selected=[...document.querySelectorAll(".days-selector input:checked")];
 if(selected.length===0)return;
 
 const id=Date.now().toString();
-const days=[...selected].map(cb=>cb.value);
+const days=selected.map(cb=>cb.value);
 
-this.habits.push({id,text,days,deletedFrom:null});
-selected.forEach(cb=>cb.checked=false);
-input.value="";
+this.habits.push({id,text,days,time});
+this.save();
+this.render();
+
+document.getElementById("taskInput").value="";
+this.selectedHour="";
+this.selectedMinute="";
+document.getElementById("timeDisplay").innerText="Seleccionar horario";
+
+/* LIMPIAR SELECCION VISUAL */
+document.querySelectorAll(".time-item")
+.forEach(i=>i.classList.remove("active"));
+}
+
+deleteHabit(id){
+this.habits=this.habits.filter(h=>h.id!==id);
 this.save();
 this.render();
 }
 
-deleteHabitFromNow(id){
-const weekKey=this.getWeekKey(this.currentDate);
-const habit=this.habits.find(h=>h.id===id);
-habit.deletedFrom=weekKey;
+setStatus(id,day,status){
+const key=this.getWeekKey();
+if(!this.progress[key])this.progress[key]={};
+if(!this.progress[key][id])this.progress[key][id]={};
+this.progress[key][id][day]=status;
 this.save();
 this.render();
 }
 
-setStatus(habitId,day,status){
-const key=this.getWeekKey(this.currentDate);
-if(!this.weeklyProgress[key])this.weeklyProgress[key]={};
-if(!this.weeklyProgress[key][habitId])this.weeklyProgress[key][habitId]={};
-this.weeklyProgress[key][habitId][day]=status;
-this.save();
-this.render();
-}
-
-getStatus(habitId,day){
-const key=this.getWeekKey(this.currentDate);
-return this.weeklyProgress?.[key]?.[habitId]?.[day]||"pending";
-}
-
-isVisible(habit){
-if(!habit.deletedFrom)return true;
-return this.getWeekKey(this.currentDate)<habit.deletedFrom;
-}
-
-stats(){
-let done=0,failed=0;
-const key=this.getWeekKey(this.currentDate);
-const week=this.weeklyProgress[key]||{};
-Object.values(week).forEach(days=>{
-Object.values(days).forEach(status=>{
-if(status==="done")done++;
-if(status==="failed")failed++;
-});
-});
-return{done,failed};
-}
-
-animatePercentage(target){
-const el=document.getElementById("percentage");
-let current=0;
-const step=()=>{
-if(current<=target){
-el.innerText=current+"%";
-current++;
-requestAnimationFrame(step);
-}
-};
-step();
-}
-
-drawChart(){
-const canvas=document.getElementById("statsChart");
-const ctx=canvas.getContext("2d");
-const size=canvas.offsetWidth;
-canvas.width=size;
-canvas.height=size;
-ctx.clearRect(0,0,size,size);
-
-const {done,failed}=this.stats();
-const total=done+failed;
-if(total===0){
-this.animatePercentage(0);
-return;
-}
-
-const percent=Math.round((done/total)*100);
-this.animatePercentage(percent);
-
-const doneAngle=(done/total)*Math.PI*2;
-
-ctx.beginPath();
-ctx.moveTo(size/2,size/2);
-ctx.arc(size/2,size/2,size/2-10,0,doneAngle);
-ctx.fillStyle="#22c55e";
-ctx.fill();
-
-ctx.beginPath();
-ctx.moveTo(size/2,size/2);
-ctx.arc(size/2,size/2,size/2-10,doneAngle,Math.PI*2);
-ctx.fillStyle="#ef4444";
-ctx.fill();
+getStatus(id,day){
+const key=this.getWeekKey();
+return this.progress?.[key]?.[id]?.[day]||"";
 }
 
 render(){
-const weekStart=this.getWeekStart(this.currentDate);
-const weekEnd=new Date(weekStart);
-weekEnd.setDate(weekStart.getDate()+6);
+const start=this.getWeekStart(this.currentDate);
+const end=new Date(start);
+end.setDate(start.getDate()+6);
 
 document.getElementById("weekLabel").innerText=
-`${weekStart.toLocaleDateString()} - ${weekEnd.toLocaleDateString()}`;
+`${start.toLocaleDateString()} - ${end.toLocaleDateString()}`;
 
 const container=document.getElementById("weekContainer");
 container.innerHTML="";
@@ -398,35 +459,72 @@ div.className="day";
 div.innerHTML=`<h3>${this.labels[day]}</h3>`;
 
 this.habits
-.filter(h=>h.days.includes(day)&&this.isVisible(h))
-.forEach(habit=>{
-const status=this.getStatus(habit.id,day);
-const t=document.createElement("div");
-t.className="task";
-if(status==="done")t.classList.add("done");
-if(status==="failed")t.classList.add("failed");
+.filter(h=>h.days.includes(day))
+.sort((a,b)=>(a.time||"").localeCompare(b.time||""))
+.forEach(h=>{
+const task=document.createElement("div");
+task.className="task";
 
-t.innerHTML=`
+const status=this.getStatus(h.id,day);
+
+task.innerHTML=`
 <input type="checkbox" ${status==="done"?"checked":""}>
-<input type="checkbox" ${status==="failed"?"checked":""}>
-<span>${habit.text}</span>
-<button>Eliminar</button>
+<span>${h.text}</span>
+${h.time?`<span class="time-badge">${h.time}</span>`:""}
+<button class="delete-btn">✕</button>
 `;
 
-const checks=t.querySelectorAll("input");
-checks[0].addEventListener("change",()=>this.setStatus(habit.id,day,"done"));
-checks[1].addEventListener("change",()=>this.setStatus(habit.id,day,"failed"));
+task.querySelector("input")
+.addEventListener("change",(e)=>{
+this.setStatus(h.id,day,e.target.checked?"done":"");
+});
 
-t.querySelector("button")
-.addEventListener("click",()=>this.deleteHabitFromNow(habit.id));
+task.querySelector(".delete-btn")
+.addEventListener("click",()=>this.deleteHabit(h.id));
 
-div.appendChild(t);
+div.appendChild(task);
 });
 
 container.appendChild(div);
 });
 
 this.drawChart();
+}
+
+drawChart(){
+const canvas=document.getElementById("statsChart");
+const ctx=canvas.getContext("2d");
+canvas.width=200;
+canvas.height=200;
+ctx.clearRect(0,0,200,200);
+
+let done=0,total=0;
+const key=this.getWeekKey();
+const week=this.progress[key]||{};
+
+Object.values(week).forEach(days=>{
+Object.values(days).forEach(s=>{
+if(s==="done")done++;
+total++;
+});
+});
+
+const percent=total?Math.round(done/total*100):0;
+document.getElementById("percentage").innerText=percent+"%";
+
+const angle=(percent/100)*Math.PI*2;
+
+ctx.beginPath();
+ctx.moveTo(100,100);
+ctx.arc(100,100,90,0,angle);
+ctx.fillStyle="#22c55e";
+ctx.fill();
+
+ctx.beginPath();
+ctx.moveTo(100,100);
+ctx.arc(100,100,90,angle,Math.PI*2);
+ctx.fillStyle="#ef4444";
+ctx.fill();
 }
 }
 
@@ -435,4 +533,5 @@ const app=new App();
 
 </body>
 </html>
+
 
