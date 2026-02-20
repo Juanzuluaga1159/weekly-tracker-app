@@ -1,4 +1,4 @@
-const CACHE_NAME = "weekly-tracker-cache-v5";
+const CACHE_NAME = "weekly-tracker-cache-v7";
 
 const urlsToCache = [
   "./",
@@ -40,5 +40,6 @@ self.addEventListener("fetch", event => {
       .then(response => response || fetch(event.request))
   );
 });
+
 
 
