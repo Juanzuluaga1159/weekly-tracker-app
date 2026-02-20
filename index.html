@@ -2,138 +2,117 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>Weekly Tracker</title>
 
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#111827">
+<meta name="theme-color" content="#0f172a">
 
 <style>
 :root{
-    --bg:#f4f5f7;
-    --card:#ffffff;
-    --border:#e5e7eb;
-    --primary:#111827;
-    --success:#16a34a;
-    --fail:#dc2626;
-    --text:#111827;
+    --bg: linear-gradient(160deg,#0f172a,#1e293b);
+    --card: rgba(255,255,255,0.07);
+    --border: rgba(255,255,255,0.12);
+    --primary:#6366f1;
+    --success:#22c55e;
+    --fail:#ef4444;
+    --text:#f1f5f9;
 }
 
-body.dark{
-    --bg:#0f172a;
-    --card:#1e293b;
-    --border:#334155;
-    --primary:#f1f5f9;
-    --text:#f1f5f9;
+html,body{
+    margin:0;
+    padding:0;
+    width:100%;
+    overflow-x:hidden;
+    -webkit-text-size-adjust:100%;
 }
 
 *{
     box-sizing:border-box;
-    margin:0;
-    padding:0;
     font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
 }
 
 body{
     background:var(--bg);
     padding:16px;
+    padding-top:calc(16px + env(safe-area-inset-top));
+    padding-bottom:calc(20px + env(safe-area-inset-bottom));
     color:var(--text);
-    transition:0.3s ease;
 }
 
 .container{
-    max-width:700px;
+    width:100%;
+    max-width:460px;
     margin:auto;
 }
 
 h1{
     text-align:center;
-    margin-bottom:10px;
+    margin-bottom:20px;
     font-weight:600;
-}
-
-.top-bar{
-    display:flex;
-    justify-content:flex-end;
-    margin-bottom:15px;
 }
 
 .card{
     background:var(--card);
     border:1px solid var(--border);
-    border-radius:16px;
+    border-radius:20px;
     padding:18px;
     margin-bottom:18px;
-    transition:0.3s ease;
-}
-
-.card:hover{
-    transform:translateY(-2px);
-    box-shadow:0 8px 20px rgba(0,0,0,0.06);
+    backdrop-filter:blur(12px);
 }
 
 input[type="text"]{
     width:100%;
-    padding:12px;
-    border-radius:10px;
+    padding:14px;
+    border-radius:14px;
     border:1px solid var(--border);
-    margin-bottom:14px;
-    background:transparent;
+    background:rgba(255,255,255,0.05);
     color:var(--text);
+    margin-bottom:18px;
 }
 
 .days-selector{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
-    gap:10px;
-    font-size:14px;
-    margin-bottom:14px;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-bottom:18px;
 }
 
 .days-selector label{
     display:flex;
     align-items:center;
-    gap:6px;
+    gap:8px;
 }
 
 button{
     width:100%;
-    padding:12px;
-    background:var(--primary);
-    color:var(--bg);
+    padding:14px;
     border:none;
-    border-radius:10px;
+    border-radius:14px;
+    background:var(--primary);
+    color:white;
     cursor:pointer;
-    transition:0.2s ease;
+    transition:0.2s;
 }
 
-button:hover{transform:scale(1.02);}
-button:active{transform:scale(0.96);}
+button:active{ transform:scale(0.97); }
 
-.toggle-dark{
-    width:auto;
-    padding:6px 12px;
-    font-size:13px;
-}
-
-/* Week navigation FIXED */
 .week-nav{
-    display:grid;
-    grid-template-columns:auto 1fr auto;
-    align-items:center;
-    gap:10px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
     margin-bottom:16px;
 }
 
-.week-nav span{
-    text-align:center;
-    font-weight:500;
+.week-nav-top{
+    display:flex;
+    gap:12px;
 }
 
-.week-nav button{
-    width:auto;
-    padding:6px 12px;
-    font-size:13px;
+.week-nav-top button{
+    flex:1;
+    background:rgba(255,255,255,0.1);
+    border:1px solid var(--border);
 }
 
 .week{
@@ -144,25 +123,21 @@ button:active{transform:scale(0.96);}
 
 .day{
     border:1px solid var(--border);
-    border-radius:12px;
-    padding:12px;
+    border-radius:16px;
+    padding:14px;
+    background:rgba(255,255,255,0.04);
 }
 
-.day h3{
-    margin-bottom:8px;
-}
+.day h3{ margin-bottom:10px; }
 
 .task{
     display:flex;
     align-items:center;
-    gap:6px;
-    font-size:14px;
-    margin-bottom:6px;
+    gap:8px;
+    margin-bottom:8px;
 }
 
-.task span{
-    flex:1;
-}
+.task span{ flex:1; }
 
 .task.done span{
     text-decoration:line-through;
@@ -175,39 +150,29 @@ button:active{transform:scale(0.96);}
 }
 
 .task button{
-    padding:4px 8px;
-    font-size:11px;
     background:transparent;
     border:1px solid var(--border);
-    border-radius:6px;
-    color:var(--text);
+    padding:4px 8px;
+    font-size:12px;
+    border-radius:8px;
 }
 
-/* Responsive Chart */
 .chart-wrapper{
     position:relative;
     width:100%;
-    max-width:320px;
+    max-width:240px;
     margin:auto;
 }
 
-canvas{
-    width:100%;
-    height:auto;
-}
+canvas{ width:100%; }
 
 .percentage{
     position:absolute;
     top:50%;
     left:50%;
     transform:translate(-50%,-50%);
-    font-size:28px;
+    font-size:22px;
     font-weight:600;
-}
-
-@media(max-width:480px){
-    body{padding:12px;}
-    .card{padding:14px;}
 }
 </style>
 </head>
@@ -216,10 +181,6 @@ canvas{
 <div class="container">
 
 <h1>Weekly Tracker</h1>
-
-<div class="top-bar">
-<button class="toggle-dark" onclick="app.toggleDark()">🌙 Modo oscuro</button>
-</div>
 
 <div class="card">
 <input type="text" id="taskInput" placeholder="Nueva tarea">
@@ -239,16 +200,18 @@ canvas{
 
 <div class="card">
 <div class="week-nav">
-<button onclick="app.changeWeek(-1)">Anterior</button>
+<div class="week-nav-top">
+<button id="prevWeekBtn">Anterior</button>
+<button id="nextWeekBtn">Siguiente</button>
+</div>
 <span id="weekLabel"></span>
-<button onclick="app.changeWeek(1)">Siguiente</button>
 </div>
 
 <div class="week" id="weekContainer"></div>
 </div>
 
 <div class="card">
-<h3 style="text-align:center;margin-bottom:12px;">Rendimiento semanal</h3>
+<h3 style="text-align:center;margin-bottom:16px;">Rendimiento semanal</h3>
 <div class="chart-wrapper">
 <canvas id="statsChart"></canvas>
 <div class="percentage" id="percentage">0%</div>
@@ -258,18 +221,11 @@ canvas{
 </div>
 
 <script>
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js');
-}
-
 class App{
 constructor(){
-this.habits=JSON.parse(localStorage.getItem('habits'))||[];
-this.weeklyProgress=JSON.parse(localStorage.getItem('weeklyProgress'))||{};
-this.darkMode=localStorage.getItem('darkMode')==="true";
+this.habits=JSON.parse(localStorage.getItem("habits"))||[];
+this.weeklyProgress=JSON.parse(localStorage.getItem("weeklyProgress"))||{};
 this.currentDate=new Date();
-
-if(this.darkMode) document.body.classList.add('dark');
 
 this.labels={
 monday:"Lunes",tuesday:"Martes",wednesday:"Miércoles",
@@ -277,16 +233,19 @@ thursday:"Jueves",friday:"Viernes",
 saturday:"Sábado",sunday:"Domingo"
 };
 
-document.getElementById('addTaskBtn')
-.addEventListener('click',()=>this.addHabit());
-
+this.initEvents();
 this.render();
 }
 
-toggleDark(){
-document.body.classList.toggle('dark');
-this.darkMode=!this.darkMode;
-localStorage.setItem('darkMode',this.darkMode);
+initEvents(){
+document.getElementById("addTaskBtn")
+.addEventListener("click",()=>this.addHabit());
+
+document.getElementById("prevWeekBtn")
+.addEventListener("click",()=>this.changeWeek(-1));
+
+document.getElementById("nextWeekBtn")
+.addEventListener("click",()=>this.changeWeek(1));
 }
 
 getWeekStart(date){
@@ -296,28 +255,26 @@ const diff=d.getDate()-((day+6)%7);
 return new Date(d.setDate(diff));
 }
 
+getWeekKey(date){
+return this.getWeekStart(date).toDateString();
+}
+
 changeWeek(offset){
 this.currentDate.setDate(this.currentDate.getDate()+offset*7);
 this.render();
 }
 
-getWeekKey(date){
-const year=date.getFullYear();
-const start=this.getWeekStart(date);
-return year+"-"+start.toDateString();
-}
-
 save(){
-localStorage.setItem('habits',JSON.stringify(this.habits));
-localStorage.setItem('weeklyProgress',JSON.stringify(this.weeklyProgress));
+localStorage.setItem("habits",JSON.stringify(this.habits));
+localStorage.setItem("weeklyProgress",JSON.stringify(this.weeklyProgress));
 }
 
 addHabit(){
-const input=document.getElementById('taskInput');
+const input=document.getElementById("taskInput");
 const text=input.value.trim();
 if(!text)return;
 
-const selected=document.querySelectorAll('.days-selector input:checked');
+const selected=document.querySelectorAll(".days-selector input:checked");
 if(selected.length===0)return;
 
 const id=Date.now().toString();
@@ -333,36 +290,35 @@ this.render();
 deleteHabitFromNow(id){
 const weekKey=this.getWeekKey(this.currentDate);
 const habit=this.habits.find(h=>h.id===id);
-if(!habit)return;
 habit.deletedFrom=weekKey;
 this.save();
 this.render();
 }
 
 setStatus(habitId,day,status){
-const weekKey=this.getWeekKey(this.currentDate);
-if(!this.weeklyProgress[weekKey])this.weeklyProgress[weekKey]={};
-if(!this.weeklyProgress[weekKey][habitId])this.weeklyProgress[weekKey][habitId]={};
-this.weeklyProgress[weekKey][habitId][day]=status;
+const key=this.getWeekKey(this.currentDate);
+if(!this.weeklyProgress[key])this.weeklyProgress[key]={};
+if(!this.weeklyProgress[key][habitId])this.weeklyProgress[key][habitId]={};
+this.weeklyProgress[key][habitId][day]=status;
 this.save();
 this.render();
 }
 
 getStatus(habitId,day){
-const weekKey=this.getWeekKey(this.currentDate);
-return this.weeklyProgress?.[weekKey]?.[habitId]?.[day]||"pending";
+const key=this.getWeekKey(this.currentDate);
+return this.weeklyProgress?.[key]?.[habitId]?.[day]||"pending";
 }
 
-isHabitVisible(habit){
+isVisible(habit){
 if(!habit.deletedFrom)return true;
 return this.getWeekKey(this.currentDate)<habit.deletedFrom;
 }
 
 stats(){
 let done=0,failed=0;
-const weekKey=this.getWeekKey(this.currentDate);
-const weekData=this.weeklyProgress[weekKey]||{};
-Object.values(weekData).forEach(days=>{
+const key=this.getWeekKey(this.currentDate);
+const week=this.weeklyProgress[key]||{};
+Object.values(week).forEach(days=>{
 Object.values(days).forEach(status=>{
 if(status==="done")done++;
 if(status==="failed")failed++;
@@ -372,7 +328,7 @@ return{done,failed};
 }
 
 animatePercentage(target){
-const el=document.getElementById('percentage');
+const el=document.getElementById("percentage");
 let current=0;
 const step=()=>{
 if(current<=target){
@@ -385,15 +341,14 @@ step();
 }
 
 drawChart(){
-const canvas=document.getElementById('statsChart');
-const ctx=canvas.getContext('2d');
+const canvas=document.getElementById("statsChart");
+const ctx=canvas.getContext("2d");
 const size=canvas.offsetWidth;
 canvas.width=size;
 canvas.height=size;
-
 ctx.clearRect(0,0,size,size);
 
-const{done,failed}=this.stats();
+const {done,failed}=this.stats();
 const total=done+failed;
 
 if(total===0){
@@ -409,13 +364,13 @@ const doneAngle=(done/total)*Math.PI*2;
 ctx.beginPath();
 ctx.moveTo(size/2,size/2);
 ctx.arc(size/2,size/2,size/2-10,0,doneAngle);
-ctx.fillStyle="#16a34a";
+ctx.fillStyle="#22c55e";
 ctx.fill();
 
 ctx.beginPath();
 ctx.moveTo(size/2,size/2);
 ctx.arc(size/2,size/2,size/2-10,doneAngle,Math.PI*2);
-ctx.fillStyle="#dc2626";
+ctx.fillStyle="#ef4444";
 ctx.fill();
 }
 
@@ -424,39 +379,52 @@ const weekStart=this.getWeekStart(this.currentDate);
 const weekEnd=new Date(weekStart);
 weekEnd.setDate(weekStart.getDate()+6);
 
-document.getElementById('weekLabel').innerText=
+document.getElementById("weekLabel").innerText=
 `${weekStart.toLocaleDateString()} - ${weekEnd.toLocaleDateString()}`;
 
-const container=document.getElementById('weekContainer');
-container.innerHTML='';
+const container=document.getElementById("weekContainer");
+container.innerHTML="";
 
 Object.keys(this.labels).forEach(day=>{
-const div=document.createElement('div');
-div.className='day';
+const div=document.createElement("div");
+div.className="day";
 div.innerHTML=`<h3>${this.labels[day]}</h3>`;
 
-this.habits.filter(h=>h.days.includes(day)&&this.isHabitVisible(h))
+this.habits
+.filter(h=>h.days.includes(day)&&this.isVisible(h))
 .forEach(habit=>{
 const status=this.getStatus(habit.id,day);
-const t=document.createElement('div');
-t.className='task';
-if(status==="done")t.classList.add('done');
-if(status==="failed")t.classList.add('failed');
 
-t.innerHTML=`
-<input type="checkbox" ${status==="done"?"checked":""}>
-<input type="checkbox" ${status==="failed"?"checked":""}>
-<span>${habit.text}</span>
-<button>Eliminar</button>
-`;
+const task=document.createElement("div");
+task.className="task";
+if(status==="done")task.classList.add("done");
+if(status==="failed")task.classList.add("failed");
 
-const checks=t.querySelectorAll('input');
-checks[0].addEventListener('change',()=>this.setStatus(habit.id,day,"done"));
-checks[1].addEventListener('change',()=>this.setStatus(habit.id,day,"failed"));
-t.querySelector('button')
-.addEventListener('click',()=>this.deleteHabitFromNow(habit.id));
+const doneCheck=document.createElement("input");
+doneCheck.type="checkbox";
+doneCheck.checked=status==="done";
+doneCheck.addEventListener("change",()=>{
+this.setStatus(habit.id,day,"done");
+});
 
-div.appendChild(t);
+const failCheck=document.createElement("input");
+failCheck.type="checkbox";
+failCheck.checked=status==="failed";
+failCheck.addEventListener("change",()=>{
+this.setStatus(habit.id,day,"failed");
+});
+
+const span=document.createElement("span");
+span.innerText=habit.text;
+
+const delBtn=document.createElement("button");
+delBtn.innerText="Eliminar";
+delBtn.addEventListener("click",()=>{
+this.deleteHabitFromNow(habit.id);
+});
+
+task.append(doneCheck,failCheck,span,delBtn);
+div.appendChild(task);
 });
 
 container.appendChild(div);
@@ -471,5 +439,3 @@ const app=new App();
 
 </body>
 </html>
-
-
