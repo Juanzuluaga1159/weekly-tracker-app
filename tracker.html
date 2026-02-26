@@ -133,8 +133,8 @@ font-weight:bold;
 
 /* DIAS */
 .days-selector{
-display:grid;
-grid-template-columns:1fr 1fr;
+display:flex;
+flex-direction:column;
 gap:10px;
 margin-bottom:18px;
 }
@@ -453,10 +453,14 @@ document.getElementById("weekLabel").innerText=
 const container=document.getElementById("weekContainer");
 container.innerHTML="";
 
-Object.keys(this.labels).forEach(day=>{
+Object.keys(this.labels).forEach((day,index)=>{
 const div=document.createElement("div");
 div.className="day";
-div.innerHTML=`<h3>${this.labels[day]}</h3>`;
+
+const dateForDay=new Date(start);
+dateForDay.setDate(start.getDate()+index);
+
+div.innerHTML=`<h3>${this.labels[day]} - ${dateForDay.toLocaleDateString()}</h3>`;
 
 this.habits
 .filter(h=>h.days.includes(day))
@@ -533,5 +537,3 @@ const app=new App();
 
 </body>
 </html>
-
-
