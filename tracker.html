@@ -301,6 +301,53 @@ font-size:18px;
 </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDJjE_hn4ewp3J26-fRacHTQfvEMYesFyA",
+  authDomain: "trackly-4b946.firebaseapp.com",
+  projectId: "trackly-4b946",
+  storageBucket: "trackly-4b946.firebasestorage.app",
+  messagingSenderId: "1055095575674",
+  appId: "1:1055095575674:web:bbfa360edeedd547b557c3"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const messaging = firebase.messaging();
+
+async function requestNotificationPermission() {
+  try {
+    const permission = await Notification.requestPermission();
+
+    if (permission === "granted") {
+      console.log("Permiso concedido 🔥");
+
+      const token = await messaging.getToken({
+        vapidKey: "ROPoYfHGugJjtNZiw-Tekdihgcp-DciUsEkRuwcvyDE"
+      });
+
+      console.log("Token del dispositivo:", token);
+
+    } else {
+      console.log("Permiso denegado ❌");
+    }
+
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
+requestNotificationPermission();
+</script>
+
+<!-- TU SCRIPT ORIGINAL -->
+<script>
+
+</script>
+
 <script>
 class App{
 constructor(){
@@ -537,3 +584,4 @@ const app=new App();
 
 </body>
 </html>
+
