@@ -74,6 +74,16 @@ self.addEventListener("fetch", event => {
   );
 });
 
+self.addEventListener("push", function(event) {
+  const data = event.data ? event.data.text() : "Notificación de prueba";
+
+  self.registration.showNotification("Weekly Tracker 🔔", {
+    body: data,
+    icon: "/icons/icon-192.png"
+  });
+});
+
+
 
 
 
