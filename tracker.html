@@ -337,8 +337,9 @@ async function requestNotificationPermission() {
       console.log("Permiso concedido 🔥");
 
       const token = await messaging.getToken({
-        vapidKey: "ROPoYfHGugJjtNZiw-Tekdihgcp-DciUsEkRuwcvyDE"
-      });
+        vapidKey: "ROPoYfHGugJjtNZiw-Tekdihgcp-DciUsEkRuwcvyDE",
+        serviceWorkerRegistration: await navigator.serviceWorker.ready
+    });
 
       console.log("Token del dispositivo:", token);
 
@@ -614,6 +615,13 @@ const app=new App();
 
 </body>
 </html>
+
+
+
+
+
+
+
 
 
 
