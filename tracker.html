@@ -330,16 +330,6 @@ firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
 async function requestNotificationPermission() {
-function checkNotificationStatus(){
-  const prompt = document.getElementById("notificationPrompt");
-
-  if(Notification.permission !== "granted"){
-    prompt.style.display = "block";
-  } else {
-    prompt.style.display = "none";
-  }
-}
-
   try {
     const permission = await Notification.requestPermission();
 
@@ -361,12 +351,24 @@ function checkNotificationStatus(){
   }
 }
 
-requestNotificationPermission();
+function checkNotificationStatus(){
+  const prompt = document.getElementById("notificationPrompt");
 
-document.getElementById("enableNotificationsBtn")
-.addEventListener("click", async () => {
-  await requestNotificationPermission();
-  checkNotificationStatus();
+  if(Notification.permission !== "granted"){
+    prompt.style.display = "block";
+  } else {
+    prompt.style.display = "none";
+  }
+}
+
+
+
+window.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("enableNotificationsBtn")
+  .addEventListener("click", async () => {
+    await requestNotificationPermission();
+    checkNotificationStatus();
+  });
 });
 </script>
 
@@ -612,5 +614,6 @@ const app=new App();
 
 </body>
 </html>
+
 
 
