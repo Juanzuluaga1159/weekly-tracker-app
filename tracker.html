@@ -292,13 +292,22 @@ font-size:18px;
 
 <!-- MODAL -->
 <div class="time-modal" id="timeModal">
-<div class="time-picker">
-<div class="time-columns">
-<div class="time-column" id="hoursColumn"></div>
-<div class="time-column" id="minutesColumn"></div>
-</div>
-<button id="confirmTimeBtn">Confirmar</button>
-</div>
+  <div class="time-picker">
+
+    <!-- NUEVO BLOQUE PARA NOTIFICACIONES -->
+    <div id="notificationPrompt" style="display:none; margin-bottom:12px;">
+      <button id="enableNotificationsBtn">
+        Activar notificaciones para recordatorios
+      </button>
+    </div>
+
+    <div class="time-columns">
+      <div class="time-column" id="hoursColumn"></div>
+      <div class="time-column" id="minutesColumn"></div>
+    </div>
+
+    <button id="confirmTimeBtn">Confirmar</button>
+  </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -319,6 +328,16 @@ firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
 async function requestNotificationPermission() {
+function checkNotificationStatus(){
+  const prompt = document.getElementById("notificationPrompt");
+
+  if(Notification.permission !== "granted"){
+    prompt.style.display = "block";
+  } else {
+    prompt.style.display = "none";
+  }
+}
+
   try {
     const permission = await Notification.requestPermission();
 
@@ -341,6 +360,12 @@ async function requestNotificationPermission() {
 }
 
 requestNotificationPermission();
+
+document.getElementById("enableNotificationsBtn")
+.addEventListener("click", async () => {
+  await requestNotificationPermission();
+  checkNotificationStatus();
+});
 </script>
 
 <!-- TU SCRIPT ORIGINAL -->
@@ -388,7 +413,8 @@ minutesCol.innerHTML+=`<div class="time-item" data-minute="${mm}">${mm}</div>`;
 }
 
 display.addEventListener("click",()=>{
-modal.style.display="flex";
+  modal.style.display="flex";
+  checkNotificationStatus();
 });
 
 modal.addEventListener("click",(e)=>{
@@ -584,4 +610,3 @@ const app=new App();
 
 </body>
 </html>
-
