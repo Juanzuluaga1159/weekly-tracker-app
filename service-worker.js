@@ -1,4 +1,17 @@
-const CACHE_NAME = "weekly-tracker-cache-v13";
+const CACHE_NAME = "weekly-tracker-cache-v14";
+
+const urlsToCache = [
+  "./",
+  "index.html",
+  "tracker.html",
+  "manifest.json",
+  "icons/icon-192.png",
+  "icons/icon-512.png"
+];
+
+/* ======================
+   🔥 FIREBASE PUSH
+====================== */
 
 importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js');
@@ -14,15 +27,21 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-const urlsToCache = [
-  "./",
-  "index.html",
-  "manifest.json",
-  "icons/icon-192.png",
-  "icons/icon-512.png"
-];
+messaging.onBackgroundMessage(function(payload) {
+  const notificationTitle = payload.notification?.title || "Recordatorio";
+  const notificationOptions = {
+    body: payload.notification?.body || "Tenés una tarea pendiente",
+    icon: '/icons/icon-192.png'
+  };
 
-// INSTALL
+  self.registration.showNotification(notificationTitle, notificationOptions);
+});
+
+/* ======================
+   📦 PWA CACHE
+====================== */
+
+// INSTALACIÓN
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -31,7 +50,7 @@ self.addEventListener("install", event => {
   self.skipWaiting();
 });
 
-// ACTIVATE
+// ACTIVACIÓN
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -55,18 +74,6 @@ self.addEventListener("fetch", event => {
   );
 });
 
-// PUSH HANDLER
-messaging.onBackgroundMessage(function(payload) {
-  console.log("Push recibido en background:", payload);
-
-  const notificationTitle = payload.notification.title;
-  const notificationOptions = {
-    body: payload.notification.body,
-    icon: "icons/icon-192.png"
-  };
-
-  self.registration.showNotification(notificationTitle, notificationOptions);
-});
 
 
 
