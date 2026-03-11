@@ -1,4 +1,4 @@
-const CACHE_NAME = "weekly-tracker-cache-v14";
+const CACHE_NAME = "weekly-tracker-cache-v16";
 
 const urlsToCache = [
   "./",
@@ -82,6 +82,7 @@ self.addEventListener("push", function(event) {
     icon: "/icons/icon-192.png"
   });
 });
+
 
 
 
