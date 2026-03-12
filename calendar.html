@@ -121,6 +121,30 @@ body::after{
   box-shadow:var(--shadow);
 }
 
+.view-switch{
+  display:flex;
+  gap:10px;
+  margin-bottom:14px;
+}
+
+.view-btn{
+  flex:1;
+  padding:13px 14px;
+  border-radius:14px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,0.05);
+  color:white;
+  font-weight:800;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.view-btn.active{
+  background:linear-gradient(90deg,#dc2626,#991b1b);
+  border-color:transparent;
+  box-shadow:0 12px 24px rgba(220,38,38,.22);
+}
+
 .week-nav{
   display:flex;
   flex-direction:column;
@@ -145,14 +169,15 @@ body::after{
   transition:.2s;
 }
 
-.week-nav-top button:hover{
+.week-nav-top button:hover,
+.view-btn:hover{
   transform:translateY(-1px);
   border-color:rgba(220,38,38,.28);
 }
 
 .week-label{
   text-align:center;
-  font-size:13px;
+  font-size:14px;
   color:var(--muted);
   font-weight:700;
 }
@@ -383,6 +408,126 @@ tbody tr:last-child td{
   padding:8px 2px 2px;
 }
 
+.month-view{
+  display:none;
+}
+
+.month-grid{
+  display:grid;
+  grid-template-columns:repeat(7, minmax(0, 1fr));
+  gap:10px;
+}
+
+.month-weekday{
+  text-align:center;
+  font-size:13px;
+  font-weight:800;
+  color:#d4d4d4;
+  padding:8px 4px;
+}
+
+.month-cell{
+  min-height:150px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  cursor:pointer;
+  transition:.18s;
+}
+
+.month-cell:hover{
+  border-color:rgba(220,38,38,.26);
+  transform:translateY(-1px);
+}
+
+.month-cell.other-month{
+  opacity:.45;
+}
+
+.month-cell.today{
+  border-color:rgba(96,165,250,.45);
+  box-shadow:0 0 0 1px rgba(96,165,250,.25) inset;
+}
+
+.month-cell-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+
+.month-day-number{
+  width:32px;
+  height:32px;
+  border-radius:999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  font-weight:800;
+  color:#f3f4f6;
+}
+
+.month-cell.today .month-day-number{
+  background:#60a5fa;
+  color:#111827;
+}
+
+.month-day-name{
+  font-size:11px;
+  color:var(--muted);
+  font-weight:700;
+}
+
+.month-tasks{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.month-task{
+  width:100%;
+  border:none;
+  border-radius:10px;
+  padding:7px 8px;
+  text-align:left;
+  color:white;
+  font-size:11px;
+  cursor:pointer;
+  box-shadow:0 10px 16px rgba(0,0,0,.18);
+}
+
+.month-task-title{
+  font-weight:800;
+  line-height:1.15;
+  word-break:break-word;
+}
+
+.month-task-time{
+  margin-top:3px;
+  font-size:10px;
+  opacity:.92;
+}
+
+.month-empty{
+  font-size:12px;
+  color:#707070;
+  padding-top:4px;
+}
+
+.month-more{
+  font-size:11px;
+  color:#c4c4c4;
+  font-weight:700;
+  padding:2px 2px 0;
+  text-align:left;
+  cursor:pointer;
+}
+
 .legend{
   display:flex;
   flex-wrap:wrap;
@@ -427,7 +572,8 @@ tbody tr:last-child td{
   font-size:14px;
 }
 
-.color-modal{
+.color-modal,
+.day-modal{
   position:fixed;
   inset:0;
   display:none;
@@ -438,7 +584,8 @@ tbody tr:last-child td{
   padding:18px;
 }
 
-.color-panel{
+.color-panel,
+.day-panel{
   width:100%;
   max-width:420px;
   background:#090909;
@@ -446,15 +593,19 @@ tbody tr:last-child td{
   border-radius:24px;
   padding:18px;
   box-shadow:0 18px 40px rgba(0,0,0,.45);
+  max-height:85vh;
+  overflow:auto;
 }
 
-.color-title{
+.color-title,
+.day-title{
   margin:0 0 6px;
   font-size:18px;
   font-weight:800;
 }
 
-.color-subtitle{
+.color-subtitle,
+.day-subtitle{
   margin:0 0 16px;
   font-size:13px;
   color:var(--muted);
@@ -533,6 +684,44 @@ tbody tr:last-child td{
   border-color:transparent;
 }
 
+.day-task-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-bottom:16px;
+}
+
+.day-task-item{
+  width:100%;
+  border:none;
+  border-radius:18px;
+  padding:14px;
+  color:white;
+  text-align:left;
+  cursor:pointer;
+  box-shadow:0 12px 24px rgba(0,0,0,.22);
+}
+
+.day-task-item-title{
+  font-size:16px;
+  font-weight:800;
+  line-height:1.2;
+  word-break:break-word;
+}
+
+.day-task-item-time{
+  margin-top:8px;
+  font-size:13px;
+  font-weight:600;
+  color:rgba(255,255,255,.92);
+}
+
+.day-task-item-tip{
+  margin-top:8px;
+  font-size:11px;
+  opacity:.88;
+}
+
 @media (max-width:900px){
   .desktop-calendar{
     display:none;
@@ -544,6 +733,30 @@ tbody tr:last-child td{
 
   .legend{
     margin-top:16px;
+  }
+
+  body.month-mode .desktop-calendar,
+  body.month-mode .mobile-week{
+    display:none;
+  }
+
+  body.month-mode .month-view{
+    display:block;
+  }
+}
+
+@media (min-width:901px){
+  body.month-mode .desktop-calendar,
+  body.month-mode .mobile-week{
+    display:none;
+  }
+
+  body.month-mode .month-view{
+    display:block;
+  }
+
+  body.week-mode .month-view{
+    display:none;
   }
 }
 
@@ -571,7 +784,8 @@ tbody tr:last-child td{
     gap:10px;
   }
 
-  .week-nav-top button{
+  .week-nav-top button,
+  .view-btn{
     padding:14px 12px;
     font-size:15px;
   }
@@ -613,20 +827,109 @@ tbody tr:last-child td{
   .color-grid{
     grid-template-columns:repeat(3,1fr);
   }
+
+  .month-grid{
+    gap:4px;
+  }
+
+  .month-weekday{
+    font-size:11px;
+    padding:4px 0;
+  }
+
+  .month-cell{
+    min-height:92px;
+    padding:6px 5px;
+    border-radius:14px;
+    gap:5px;
+    overflow:hidden;
+  }
+
+  .month-cell-header{
+    gap:4px;
+    align-items:flex-start;
+  }
+
+  .month-day-number{
+    width:24px;
+    height:24px;
+    font-size:12px;
+  }
+
+  .month-day-name{
+    display:none;
+  }
+
+  .month-tasks{
+    gap:4px;
+  }
+
+  .month-task{
+    padding:5px 5px;
+    border-radius:8px;
+    font-size:9px;
+    box-shadow:none;
+  }
+
+  .month-task-title{
+    font-size:9px;
+    line-height:1.05;
+    display:-webkit-box;
+    -webkit-line-clamp:3;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+    word-break:break-word;
+  }
+
+  .month-task-time{
+    display:none;
+  }
+
+  .month-empty{
+    font-size:10px;
+    padding-top:2px;
+  }
+
+  .month-more{
+    font-size:9px;
+    padding-top:0;
+  }
+
+  .day-panel{
+    padding:16px;
+    border-radius:22px;
+  }
+
+  .day-task-item{
+    padding:14px;
+  }
+
+  .day-task-item-title{
+    font-size:15px;
+  }
+
+  .day-task-item-time{
+    font-size:13px;
+  }
 }
 </style>
 </head>
 
-<body>
+<body class="week-mode">
 <div class="container">
   <div class="topbar">
     <button class="back" onclick="goBack()">← Menú</button>
   </div>
 
   <h1 class="page-title">Planner semanal</h1>
-  <p class="page-subtitle">En celular vas a ver una semana más cómoda en tarjetas. Tocá una tarea para cambiarle el color.</p>
+  <p class="page-subtitle">Podés ver tus tareas por semana o por mes. Tocá cualquier tarea para cambiarle el color.</p>
 
   <div class="card">
+    <div class="view-switch">
+      <button id="weekViewBtn" class="view-btn active">Semana</button>
+      <button id="monthViewBtn" class="view-btn">Mes</button>
+    </div>
+
     <div class="week-nav">
       <div class="week-nav-top">
         <button id="prevWeekBtn">Anterior</button>
@@ -649,6 +952,10 @@ tbody tr:last-child td{
     </div>
 
     <div class="mobile-week" id="mobileWeek"></div>
+
+    <div class="month-view">
+      <div class="month-grid" id="monthGrid"></div>
+    </div>
 
     <div class="legend">
       <div class="legend-item">
@@ -686,19 +993,32 @@ tbody tr:last-child td{
   </div>
 </div>
 
+<div class="day-modal" id="dayModal">
+  <div class="day-panel">
+    <h3 class="day-title" id="dayModalTitle">Tareas del día</h3>
+    <p class="day-subtitle" id="dayModalSubtitle">Tocá una tarea para cambiarle el color.</p>
+
+    <div class="day-task-list" id="dayTaskList"></div>
+
+    <div class="modal-actions">
+      <button class="modal-btn primary" id="closeDayModalBtn">Cerrar</button>
+    </div>
+  </div>
+</div>
+
 <script>
 function goBack(){
   window.location.href = "index.html";
 }
 
 const dayMap = {
-  monday: 0,
-  tuesday: 1,
-  wednesday: 2,
-  thursday: 3,
-  friday: 4,
-  saturday: 5,
-  sunday: 6
+  sunday: 0,
+  monday: 1,
+  tuesday: 2,
+  wednesday: 3,
+  thursday: 4,
+  friday: 5,
+  saturday: 6
 };
 
 const orderedDays = [
@@ -710,6 +1030,8 @@ const orderedDays = [
   { key:"saturday", short:"S", label:"Sábado" },
   { key:"sunday", short:"D", label:"Domingo" }
 ];
+
+const monthWeekDays = ["L","M","X","J","V","S","D"];
 
 const colorOptions = [
   { id:"red", start:"#dc2626", end:"#991b1b" },
@@ -734,10 +1056,19 @@ const colorPreview = document.getElementById("colorPreview");
 const colorPreviewText = document.getElementById("colorPreviewText");
 const colorPreviewTime = document.getElementById("colorPreviewTime");
 const mobileWeek = document.getElementById("mobileWeek");
+const monthGrid = document.getElementById("monthGrid");
+const weekViewBtn = document.getElementById("weekViewBtn");
+const monthViewBtn = document.getElementById("monthViewBtn");
+const dayModal = document.getElementById("dayModal");
+const dayTaskList = document.getElementById("dayTaskList");
+const dayModalTitle = document.getElementById("dayModalTitle");
+const dayModalSubtitle = document.getElementById("dayModalSubtitle");
 
 let currentDate = new Date();
+let currentView = "week";
 let selectedHabitId = null;
 let selectedColorId = null;
+let selectedDayDate = null;
 
 function pad(value){
   return String(value).padStart(2, "0");
@@ -759,10 +1090,8 @@ function getHalfHourSlots(){
 
 function parseTimeToMinutes(time){
   if(!time || typeof time !== "string" || !time.includes(":")) return null;
-
   const [h, m] = time.split(":").map(Number);
   if(Number.isNaN(h) || Number.isNaN(m)) return null;
-
   return h * 60 + m;
 }
 
@@ -818,6 +1147,13 @@ function getWeekRangeLabel(start){
   return `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`;
 }
 
+function getMonthLabel(date){
+  return date.toLocaleDateString("es-AR", {
+    month: "long",
+    year: "numeric"
+  });
+}
+
 function getDateForColumn(index){
   const start = getWeekStart(currentDate);
   const date = new Date(start);
@@ -839,6 +1175,24 @@ function formatLongDate(date){
   });
 }
 
+function formatDayModalDate(date){
+  return date.toLocaleDateString("es-AR", {
+    weekday:"long",
+    day:"numeric",
+    month:"long"
+  });
+}
+
+function isSameDate(a, b){
+  return a.getFullYear() === b.getFullYear()
+    && a.getMonth() === b.getMonth()
+    && a.getDate() === b.getDate();
+}
+
+function isMobileMonthCompact(){
+  return window.innerWidth <= 700;
+}
+
 function buildHeader(){
   calendarHeadRow.innerHTML = `<th class="time-col">Hora</th>`;
 
@@ -853,8 +1207,14 @@ function buildHeader(){
     `;
     calendarHeadRow.appendChild(th);
   });
+}
 
-  weekLabel.textContent = getWeekRangeLabel(getWeekStart(currentDate));
+function updateTopLabel(){
+  if(currentView === "week"){
+    weekLabel.textContent = getWeekRangeLabel(getWeekStart(currentDate));
+  } else {
+    weekLabel.textContent = getMonthLabel(currentDate);
+  }
 }
 
 function clearCalendar(){
@@ -884,9 +1244,7 @@ function createRow(timeLabel, rowClass = ""){
 function buildBaseGrid(){
   clearCalendar();
   createRow("Sin hora", "no-time-row");
-
-  const slots = getHalfHourSlots();
-  slots.forEach(slot => createRow(slot));
+  getHalfHourSlots().forEach(slot => createRow(slot));
 }
 
 function getColorById(colorId, isNoTime = false){
@@ -912,7 +1270,6 @@ function createTaskElement(habit, isNoTime = false){
   const title = document.createElement("div");
   title.className = "task-title";
   title.textContent = typeof habit.text === "string" && habit.text.trim() ? habit.text.trim() : "Tarea";
-
   button.appendChild(title);
 
   if(timeData.label){
@@ -922,7 +1279,8 @@ function createTaskElement(habit, isNoTime = false){
     button.appendChild(time);
   }
 
-  button.addEventListener("click", () => {
+  button.addEventListener("click", (event) => {
+    event.stopPropagation();
     openColorModal(habit);
   });
 
@@ -936,7 +1294,6 @@ function createMobileTaskElement(habit, isNoTime = false){
   const button = document.createElement("button");
   button.type = "button";
   button.className = "mobile-task";
-  button.dataset.habitId = habit.id || "";
   button.style.background = `linear-gradient(180deg, ${color.start}, ${color.end})`;
 
   const top = document.createElement("div");
@@ -959,8 +1316,69 @@ function createMobileTaskElement(habit, isNoTime = false){
   time.textContent = timeData.label || "Sin horario";
   button.appendChild(time);
 
-  button.addEventListener("click", () => {
+  button.addEventListener("click", () => openColorModal(habit));
+  return button;
+}
+
+function createMonthTaskElement(habit, isNoTime = false){
+  const timeData = getHabitTimeData(habit);
+  const color = getHabitColor(habit, isNoTime);
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "month-task";
+  button.style.background = `linear-gradient(180deg, ${color.start}, ${color.end})`;
+
+  const title = document.createElement("div");
+  title.className = "month-task-title";
+  title.textContent = typeof habit.text === "string" && habit.text.trim() ? habit.text.trim() : "Tarea";
+  button.appendChild(title);
+
+  if(timeData.label){
+    const time = document.createElement("div");
+    time.className = "month-task-time";
+    time.textContent = timeData.label;
+    button.appendChild(time);
+  }
+
+  button.addEventListener("click", (event) => {
+    event.stopPropagation();
     openColorModal(habit);
+  });
+
+  return button;
+}
+
+function createDayModalTaskElement(habit, isNoTime = false){
+  const timeData = getHabitTimeData(habit);
+  const color = getHabitColor(habit, isNoTime);
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "day-task-item";
+  button.style.background = `linear-gradient(180deg, ${color.start}, ${color.end})`;
+
+  const title = document.createElement("div");
+  title.className = "day-task-item-title";
+  title.textContent = typeof habit.text === "string" && habit.text.trim() ? habit.text.trim() : "Tarea";
+
+  const time = document.createElement("div");
+  time.className = "day-task-item-time";
+  time.textContent = timeData.label || "Sin horario";
+
+  const tip = document.createElement("div");
+  tip.className = "day-task-item-tip";
+  tip.textContent = "Tocá para cambiar color";
+
+  button.appendChild(title);
+  button.appendChild(time);
+  button.appendChild(tip);
+
+  button.addEventListener("click", () => {
+    closeDayModal();
+    setTimeout(() => {
+      openColorModal(habit);
+    }, 0);
   });
 
   return button;
@@ -987,14 +1405,12 @@ function getCoveredTimeLabels(habit){
   }
 
   if(!timeData.end){
-    const roundedStart = Math.floor(startMinutes / 30) * 30;
-    return [formatTimeLabelFromMinutes(roundedStart)];
+    return [formatTimeLabelFromMinutes(Math.floor(startMinutes / 30) * 30)];
   }
 
   const endMinutes = parseTimeToMinutes(timeData.end);
   if(endMinutes === null || endMinutes < startMinutes){
-    const roundedStart = Math.floor(startMinutes / 30) * 30;
-    return [formatTimeLabelFromMinutes(roundedStart)];
+    return [formatTimeLabelFromMinutes(Math.floor(startMinutes / 30) * 30)];
   }
 
   const covered = [];
@@ -1039,16 +1455,17 @@ function renderHabitsInCalendar(){
     const coveredSlots = getCoveredTimeLabels(habit);
 
     days.forEach(dayKey => {
-      const dayIndex = dayMap[dayKey];
-      if(dayIndex === undefined) return;
+      const jsDay = dayMap[dayKey];
+      if(jsDay === undefined) return;
+      const columnIndex = (jsDay + 6) % 7;
 
       if(!hasTime){
-        addTaskToCell(dayIndex, "Sin hora", createTaskElement(habit, true));
+        addTaskToCell(columnIndex, "Sin hora", createTaskElement(habit, true));
         return;
       }
 
       coveredSlots.forEach(slotLabel => {
-        addTaskToCell(dayIndex, slotLabel, createTaskElement(habit, false));
+        addTaskToCell(columnIndex, slotLabel, createTaskElement(habit, false));
       });
     });
   });
@@ -1107,7 +1524,7 @@ function renderMobileWeek(){
       empty.className = "mobile-empty";
       empty.textContent = "No hay tareas para este día";
       list.appendChild(empty);
-    }else{
+    } else {
       dayHabits.forEach(habit => {
         const isNoTime = !getHabitTimeData(habit).start;
         list.appendChild(createMobileTaskElement(habit, isNoTime));
@@ -1119,16 +1536,190 @@ function renderMobileWeek(){
   });
 }
 
+function getMonthGridDates(baseDate){
+  const year = baseDate.getFullYear();
+  const month = baseDate.getMonth();
+
+  const firstDayOfMonth = new Date(year, month, 1);
+  const firstGridDate = new Date(firstDayOfMonth);
+  const offset = (firstDayOfMonth.getDay() + 6) % 7;
+  firstGridDate.setDate(firstDayOfMonth.getDate() - offset);
+  firstGridDate.setHours(0,0,0,0);
+
+  const dates = [];
+  for(let i = 0; i < 42; i++){
+    const date = new Date(firstGridDate);
+    date.setDate(firstGridDate.getDate() + i);
+    dates.push(date);
+  }
+
+  return dates;
+}
+
+function getHabitsForDate(date){
+  const habits = getHabits();
+  const jsDay = date.getDay();
+
+  return habits
+    .filter(habit => {
+      const days = Array.isArray(habit.days) ? habit.days : [];
+      return days.some(dayKey => dayMap[dayKey] === jsDay);
+    })
+    .sort((a, b) => {
+      const timeA = getHabitTimeData(a).start || "99:99";
+      const timeB = getHabitTimeData(b).start || "99:99";
+      return timeA.localeCompare(timeB);
+    });
+}
+
+function openDayModal(date){
+  selectedDayDate = new Date(date);
+
+  const habits = getHabitsForDate(date);
+  dayModalTitle.textContent = formatDayModalDate(date);
+
+  if(habits.length === 0){
+    dayModalSubtitle.textContent = "No hay tareas cargadas para este día.";
+  } else {
+    dayModalSubtitle.textContent = `Tenés ${habits.length} tarea${habits.length === 1 ? "" : "s"} para este día. Tocá una para cambiarle el color.`;
+  }
+
+  dayTaskList.innerHTML = "";
+
+  if(habits.length === 0){
+    const empty = document.createElement("div");
+    empty.className = "empty-state";
+    empty.textContent = "No hay tareas para este día.";
+    dayTaskList.appendChild(empty);
+  } else {
+    habits.forEach(habit => {
+      const isNoTime = !getHabitTimeData(habit).start;
+      dayTaskList.appendChild(createDayModalTaskElement(habit, isNoTime));
+    });
+  }
+
+  dayModal.style.display = "flex";
+}
+
+function closeDayModal(){
+  dayModal.style.display = "none";
+  selectedDayDate = null;
+}
+
+function renderMonthView(){
+  monthGrid.innerHTML = "";
+
+  monthWeekDays.forEach(label => {
+    const header = document.createElement("div");
+    header.className = "month-weekday";
+    header.textContent = label;
+    monthGrid.appendChild(header);
+  });
+
+  const dates = getMonthGridDates(currentDate);
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  dates.forEach(date => {
+    const cell = document.createElement("div");
+    cell.className = "month-cell";
+
+    if(date.getMonth() !== currentDate.getMonth()){
+      cell.classList.add("other-month");
+    }
+
+    if(isSameDate(date, today)){
+      cell.classList.add("today");
+    }
+
+    cell.addEventListener("click", () => {
+      openDayModal(date);
+    });
+
+    const header = document.createElement("div");
+    header.className = "month-cell-header";
+
+    const dayNumber = document.createElement("div");
+    dayNumber.className = "month-day-number";
+    dayNumber.textContent = String(date.getDate());
+
+    const dayName = document.createElement("div");
+    dayName.className = "month-day-name";
+    dayName.textContent = date.toLocaleDateString("es-AR", { weekday:"short" });
+
+    header.appendChild(dayNumber);
+    header.appendChild(dayName);
+    cell.appendChild(header);
+
+    const tasksWrap = document.createElement("div");
+    tasksWrap.className = "month-tasks";
+
+    const habits = getHabitsForDate(date);
+    const mobileCompact = isMobileMonthCompact();
+    const visibleHabits = mobileCompact ? habits.slice(0, 2) : habits;
+
+    if(habits.length === 0){
+      const empty = document.createElement("div");
+      empty.className = "month-empty";
+      empty.textContent = "Sin tareas";
+      tasksWrap.appendChild(empty);
+    } else {
+      visibleHabits.forEach(habit => {
+        const isNoTime = !getHabitTimeData(habit).start;
+        tasksWrap.appendChild(createMonthTaskElement(habit, isNoTime));
+      });
+
+      if(mobileCompact && habits.length > visibleHabits.length){
+        const more = document.createElement("div");
+        more.className = "month-more";
+        more.textContent = `+${habits.length - visibleHabits.length} más`;
+        more.addEventListener("click", (event) => {
+          event.stopPropagation();
+          openDayModal(date);
+        });
+        tasksWrap.appendChild(more);
+      }
+    }
+
+    cell.appendChild(tasksWrap);
+    monthGrid.appendChild(cell);
+  });
+}
+
 function renderCalendar(){
   buildHeader();
   buildBaseGrid();
   renderHabitsInCalendar();
   renderMobileWeek();
+  renderMonthView();
+  updateTopLabel();
 }
 
-function changeWeek(offset){
-  currentDate.setDate(currentDate.getDate() + offset * 7);
+function changeRange(offset){
+  if(currentView === "week"){
+    currentDate.setDate(currentDate.getDate() + offset * 7);
+  } else {
+    currentDate.setMonth(currentDate.getMonth() + offset);
+  }
   renderCalendar();
+}
+
+function setView(view){
+  currentView = view;
+
+  if(view === "week"){
+    document.body.classList.remove("month-mode");
+    document.body.classList.add("week-mode");
+    weekViewBtn.classList.add("active");
+    monthViewBtn.classList.remove("active");
+  } else {
+    document.body.classList.remove("week-mode");
+    document.body.classList.add("month-mode");
+    weekViewBtn.classList.remove("active");
+    monthViewBtn.classList.add("active");
+  }
+
+  updateTopLabel();
 }
 
 function buildColorGrid(){
@@ -1200,14 +1791,24 @@ function applySelectedColor(){
   renderCalendar();
 }
 
-document.getElementById("prevWeekBtn").addEventListener("click", () => changeWeek(-1));
-document.getElementById("nextWeekBtn").addEventListener("click", () => changeWeek(1));
+document.getElementById("prevWeekBtn").addEventListener("click", () => changeRange(-1));
+document.getElementById("nextWeekBtn").addEventListener("click", () => changeRange(1));
 document.getElementById("cancelColorBtn").addEventListener("click", closeColorModal);
 document.getElementById("saveColorBtn").addEventListener("click", applySelectedColor);
+document.getElementById("closeDayModalBtn").addEventListener("click", closeDayModal);
+
+weekViewBtn.addEventListener("click", () => setView("week"));
+monthViewBtn.addEventListener("click", () => setView("month"));
 
 colorModal.addEventListener("click", (event) => {
   if(event.target === colorModal){
     closeColorModal();
+  }
+});
+
+dayModal.addEventListener("click", (event) => {
+  if(event.target === dayModal){
+    closeDayModal();
   }
 });
 
@@ -1217,8 +1818,14 @@ window.addEventListener("storage", (event) => {
   }
 });
 
+window.addEventListener("resize", () => {
+  renderMonthView();
+});
+
 buildColorGrid();
 renderCalendar();
+setView("week");
 </script>
 </body>
 </html>
+
