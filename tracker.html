@@ -79,6 +79,40 @@ max-width:520px;
 margin:0 auto;
 }
 
+.topbar{
+display:flex;
+align-items:center;
+justify-content:flex-start;
+margin-bottom:12px;
+}
+
+.back-btn{
+display:inline-flex;
+align-items:center;
+gap:8px;
+padding:10px 14px;
+border:none;
+border-radius:14px;
+background:rgba(255,255,255,0.05);
+border:1px solid var(--border);
+color:white;
+font-size:13px;
+font-weight:700;
+cursor:pointer;
+transition:.2s;
+box-shadow:0 10px 24px rgba(0,0,0,.22);
+}
+
+.back-btn:hover{
+transform:translateY(-1px);
+border-color:rgba(220,38,38,.25);
+box-shadow:0 12px 26px rgba(220,38,38,.10);
+}
+
+.back-btn:active{
+transform:scale(.98);
+}
+
 h1{
 margin:4px 0 22px;
 text-align:center;
@@ -337,6 +371,7 @@ min-width:0;
 display:flex;
 align-items:center;
 gap:8px;
+flex-wrap:wrap;
 }
 
 .task-name{
@@ -345,6 +380,7 @@ font-size:14px;
 font-weight:500;
 word-break:break-word;
 transition:.2s;
+min-width:140px;
 }
 
 .task.done .task-name{
@@ -564,11 +600,27 @@ border:1px solid rgba(220,38,38,.35);
 box-shadow:0 10px 24px rgba(127,29,29,.25);
 }
 
+.range-group{
+margin-bottom:18px;
+padding:12px;
+border-radius:16px;
+background:rgba(255,255,255,0.03);
+border:1px solid var(--border);
+}
+
+.range-group h4{
+margin:0 0 10px;
+font-size:13px;
+font-weight:700;
+color:#f5f5f5;
+text-transform:uppercase;
+letter-spacing:.4px;
+}
+
 .time-columns{
 display:flex;
 gap:14px;
-height:220px;
-margin-bottom:16px;
+height:160px;
 }
 
 .time-column{
@@ -611,6 +663,15 @@ font-size:12px;
 color:var(--muted);
 margin-top:8px;
 line-height:1.4;
+}
+
+.range-preview{
+text-align:center;
+font-size:14px;
+font-weight:700;
+margin:6px 0 16px;
+color:#fca5a5;
+min-height:20px;
 }
 
 @media (max-width:520px){
@@ -660,21 +721,25 @@ font-size:24px;
 <body>
 <div class="container">
 
+<div class="topbar">
+  <button class="back-btn" onclick="goToMenu()">← Menú principal</button>
+</div>
+
 <h1>Weekly Tracker</h1>
 
 <div class="card task-creator">
   <h2 class="section-title">Nueva tarea</h2>
-  <p class="section-subtitle">Completá estos pasos para crear un recordatorio semanal claro y rápido.</p>
+  <p class="section-subtitle">Completá estos pasos para crear una tarea semanal con rango horario.</p>
 
   <div class="step">
     <label class="step-label">1. Nombre</label>
-    <input type="text" id="taskInput" placeholder="Ej: Entrenar, Leer, Meditar">
+    <input type="text" id="taskInput" placeholder="Ej: Clase de facultad, Entrenar, Leer">
   </div>
 
   <div class="step">
     <label class="step-label">2. Horario opcional</label>
-    <div class="time-display" id="timeDisplay">Seleccionar horario</div>
-    <div class="helper-text">Elegí una hora solo si querés recibir recordatorios.</div>
+    <div class="time-display" id="timeDisplay">Seleccionar rango horario</div>
+    <div class="helper-text">Ejemplo: 06:00 - 08:00</div>
   </div>
 
   <div class="step">
@@ -738,8 +803,8 @@ font-size:24px;
 
 <div class="time-modal" id="timeModal">
   <div class="time-picker">
-    <h3 class="time-picker-title">Elegir horario</h3>
-    <p class="time-picker-subtitle">Seleccioná hora y minutos para tu recordatorio</p>
+    <h3 class="time-picker-title">Elegir rango horario</h3>
+    <p class="time-picker-subtitle">Seleccioná hora de inicio y hora de fin</p>
 
     <div id="notificationPrompt" style="display:none;">
       <button id="enableNotificationsBtn" class="primary-btn">
@@ -747,9 +812,22 @@ font-size:24px;
       </button>
     </div>
 
-    <div class="time-columns">
-      <div class="time-column" id="hoursColumn"></div>
-      <div class="time-column" id="minutesColumn"></div>
+    <div class="range-preview" id="rangePreview"></div>
+
+    <div class="range-group">
+      <h4>Hora de inicio</h4>
+      <div class="time-columns">
+        <div class="time-column" id="startHoursColumn"></div>
+        <div class="time-column" id="startMinutesColumn"></div>
+      </div>
+    </div>
+
+    <div class="range-group">
+      <h4>Hora de fin</h4>
+      <div class="time-columns">
+        <div class="time-column" id="endHoursColumn"></div>
+        <div class="time-column" id="endMinutesColumn"></div>
+      </div>
     </div>
 
     <button id="confirmTimeBtn" class="primary-btn">Confirmar horario</button>
@@ -758,6 +836,7 @@ font-size:24px;
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
 <script>
 const firebaseConfig = {
@@ -771,6 +850,11 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
+const db = firebase.firestore();
+
+function goToMenu(){
+  window.location.href = "index.html";
+}
 
 async function requestNotificationPermission() {
   try {
@@ -783,6 +867,13 @@ async function requestNotificationPermission() {
       });
 
       console.log("Token del dispositivo:", token);
+
+      await db.collection("devices").doc(token).set({
+        token,
+        createdAt: Date.now()
+      });
+
+      localStorage.setItem("fcmToken", token);
     } else {
       console.log("Permiso denegado");
     }
@@ -810,11 +901,11 @@ window.addEventListener("DOMContentLoaded", () => {
 
 class App{
   constructor(){
-    this.habits=JSON.parse(localStorage.getItem("habits"))||[];
-    this.progress=JSON.parse(localStorage.getItem("progress"))||{};
-    this.currentDate=new Date();
+    this.habits = JSON.parse(localStorage.getItem("habits")) || [];
+    this.progress = JSON.parse(localStorage.getItem("progress")) || {};
+    this.currentDate = new Date();
 
-    this.labels={
+    this.labels = {
       monday:"Lunes",
       tuesday:"Martes",
       wednesday:"Miércoles",
@@ -824,74 +915,141 @@ class App{
       sunday:"Domingo"
     };
 
-    this.selectedHour="";
-    this.selectedMinute="";
+    this.selectedStartHour = "";
+    this.selectedStartMinute = "";
+    this.selectedEndHour = "";
+    this.selectedEndMinute = "";
+
     this.initTimePicker();
 
     document.getElementById("addTaskBtn")
-    .addEventListener("click",()=>this.addHabit());
+      .addEventListener("click", () => this.addHabit());
 
     this.render();
   }
 
-  initTimePicker(){
-    const modal=document.getElementById("timeModal");
-    const display=document.getElementById("timeDisplay");
-    const hoursCol=document.getElementById("hoursColumn");
-    const minutesCol=document.getElementById("minutesColumn");
+  buildTimeColumn(containerId, type, values){
+    const column = document.getElementById(containerId);
+    column.innerHTML = "";
 
-    hoursCol.innerHTML="";
-    minutesCol.innerHTML="";
-
-    for(let h=0;h<24;h++){
-      const hh=h.toString().padStart(2,"0");
-      hoursCol.innerHTML+=`<div class="time-item" data-hour="${hh}">${hh}</div>`;
-    }
-
-    for(let m=0;m<60;m++){
-      const mm=m.toString().padStart(2,"0");
-      minutesCol.innerHTML+=`<div class="time-item" data-minute="${mm}">${mm}</div>`;
-    }
-
-    display.addEventListener("click",()=>{
-      modal.style.display="flex";
-      checkNotificationStatus();
-    });
-
-    modal.addEventListener("click",(e)=>{
-      if(e.target===modal) modal.style.display="none";
-    });
-
-    hoursCol.addEventListener("click",(e)=>{
-      if(e.target.classList.contains("time-item")){
-        hoursCol.querySelectorAll(".time-item").forEach(i=>i.classList.remove("active"));
-        e.target.classList.add("active");
-        this.selectedHour=e.target.dataset.hour;
-      }
-    });
-
-    minutesCol.addEventListener("click",(e)=>{
-      if(e.target.classList.contains("time-item")){
-        minutesCol.querySelectorAll(".time-item").forEach(i=>i.classList.remove("active"));
-        e.target.classList.add("active");
-        this.selectedMinute=e.target.dataset.minute;
-      }
-    });
-
-    document.getElementById("confirmTimeBtn")
-    .addEventListener("click",()=>{
-      if(this.selectedHour!=="" && this.selectedMinute!==""){
-        display.innerText=`${this.selectedHour}:${this.selectedMinute}`;
-        display.classList.add("has-time");
-      }
-      modal.style.display="none";
+    values.forEach(value => {
+      const item = document.createElement("div");
+      item.className = "time-item";
+      item.textContent = value;
+      item.dataset[type] = value;
+      column.appendChild(item);
     });
   }
 
+  updateRangePreview(){
+    const preview = document.getElementById("rangePreview");
+
+    if(
+      this.selectedStartHour !== "" &&
+      this.selectedStartMinute !== "" &&
+      this.selectedEndHour !== "" &&
+      this.selectedEndMinute !== ""
+    ){
+      preview.textContent = `${this.selectedStartHour}:${this.selectedStartMinute} - ${this.selectedEndHour}:${this.selectedEndMinute}`;
+    } else {
+      preview.textContent = "";
+    }
+  }
+
+  bindTimeColumn(containerId, type, onSelect){
+    const column = document.getElementById(containerId);
+
+    column.addEventListener("click", (e) => {
+      if(!e.target.classList.contains("time-item")) return;
+
+      column.querySelectorAll(".time-item").forEach(item => item.classList.remove("active"));
+      e.target.classList.add("active");
+
+      onSelect(e.target.dataset[type]);
+      this.updateRangePreview();
+    });
+  }
+
+  initTimePicker(){
+    const modal = document.getElementById("timeModal");
+    const display = document.getElementById("timeDisplay");
+
+    const hours = Array.from({length: 24}, (_, i) => i.toString().padStart(2, "0"));
+    const minutes = Array.from({length: 60}, (_, i) => i.toString().padStart(2, "0"));
+
+    this.buildTimeColumn("startHoursColumn", "hour", hours);
+    this.buildTimeColumn("startMinutesColumn", "minute", minutes);
+    this.buildTimeColumn("endHoursColumn", "hour", hours);
+    this.buildTimeColumn("endMinutesColumn", "minute", minutes);
+
+    this.bindTimeColumn("startHoursColumn", "hour", value => {
+      this.selectedStartHour = value;
+    });
+
+    this.bindTimeColumn("startMinutesColumn", "minute", value => {
+      this.selectedStartMinute = value;
+    });
+
+    this.bindTimeColumn("endHoursColumn", "hour", value => {
+      this.selectedEndHour = value;
+    });
+
+    this.bindTimeColumn("endMinutesColumn", "minute", value => {
+      this.selectedEndMinute = value;
+    });
+
+    display.addEventListener("click", () => {
+      modal.style.display = "flex";
+      checkNotificationStatus();
+      this.updateRangePreview();
+    });
+
+    modal.addEventListener("click", (e) => {
+      if(e.target === modal) modal.style.display = "none";
+    });
+
+    document.getElementById("confirmTimeBtn")
+      .addEventListener("click", () => {
+        const hasAnyValue =
+          this.selectedStartHour !== "" ||
+          this.selectedStartMinute !== "" ||
+          this.selectedEndHour !== "" ||
+          this.selectedEndMinute !== "";
+
+        if(!hasAnyValue){
+          modal.style.display = "none";
+          return;
+        }
+
+        const isComplete =
+          this.selectedStartHour !== "" &&
+          this.selectedStartMinute !== "" &&
+          this.selectedEndHour !== "" &&
+          this.selectedEndMinute !== "";
+
+        if(!isComplete){
+          alert("Completá hora de inicio y hora de fin");
+          return;
+        }
+
+        const startTotal = Number(this.selectedStartHour) * 60 + Number(this.selectedStartMinute);
+        const endTotal = Number(this.selectedEndHour) * 60 + Number(this.selectedEndMinute);
+
+        if(endTotal <= startTotal){
+          alert("La hora de fin tiene que ser mayor que la hora de inicio");
+          return;
+        }
+
+        display.innerText = `${this.selectedStartHour}:${this.selectedStartMinute} - ${this.selectedEndHour}:${this.selectedEndMinute}`;
+        display.classList.add("has-time");
+        modal.style.display = "none";
+      });
+  }
+
   getWeekStart(date){
-    const d=new Date(date);
-    const day=d.getDay();
-    const diff=d.getDate()-((day+6)%7);
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - ((day + 6) % 7);
     return new Date(d.setDate(diff));
   }
 
@@ -900,141 +1058,278 @@ class App{
   }
 
   changeWeek(offset){
-    this.currentDate.setDate(this.currentDate.getDate()+offset*7);
+    this.currentDate.setDate(this.currentDate.getDate() + offset * 7);
     this.render();
   }
 
   save(){
-    localStorage.setItem("habits",JSON.stringify(this.habits));
-    localStorage.setItem("progress",JSON.stringify(this.progress));
+    localStorage.setItem("habits", JSON.stringify(this.habits));
+    localStorage.setItem("progress", JSON.stringify(this.progress));
   }
 
-  addHabit(){
-    const text=document.getElementById("taskInput").value.trim();
-    if(!text)return;
+  clearColumnSelection(columnId){
+    document.querySelectorAll(`#${columnId} .time-item`).forEach(item => {
+      item.classList.remove("active");
+    });
+  }
 
-    const time=this.selectedHour && this.selectedMinute
-      ? `${this.selectedHour}:${this.selectedMinute}`
-      : "";
+  resetTaskForm(){
+    document.getElementById("taskInput").value = "";
 
-    const selected=[...document.querySelectorAll(".days-selector input:checked")];
-    if(selected.length===0)return;
+    this.selectedStartHour = "";
+    this.selectedStartMinute = "";
+    this.selectedEndHour = "";
+    this.selectedEndMinute = "";
 
-    const id=Date.now().toString();
-    const days=selected.map(cb=>cb.value);
+    const timeDisplay = document.getElementById("timeDisplay");
+    timeDisplay.innerText = "Seleccionar rango horario";
+    timeDisplay.classList.remove("has-time");
 
-    this.habits.push({id,text,days,time});
+    this.clearColumnSelection("startHoursColumn");
+    this.clearColumnSelection("startMinutesColumn");
+    this.clearColumnSelection("endHoursColumn");
+    this.clearColumnSelection("endMinutesColumn");
+
+    document.getElementById("rangePreview").textContent = "";
+
+    document.querySelectorAll(".days-selector input").forEach(i => {
+      i.checked = false;
+    });
+  }
+
+  getTimeLabel(habit){
+    if(habit.timeLabel) return habit.timeLabel;
+    if(habit.timeStart && habit.timeEnd) return `${habit.timeStart} - ${habit.timeEnd}`;
+    if(habit.time) return habit.time;
+    return "";
+  }
+
+  async addHabit(){
+    const text = document.getElementById("taskInput").value.trim();
+
+    if(!text){
+      alert("Escribí un nombre para la tarea");
+      return;
+    }
+
+    const selected = [...document.querySelectorAll(".days-selector input:checked")];
+
+    if(selected.length === 0){
+      alert("Seleccioná al menos un día");
+      return;
+    }
+
+    const hasPartialTime =
+      this.selectedStartHour !== "" ||
+      this.selectedStartMinute !== "" ||
+      this.selectedEndHour !== "" ||
+      this.selectedEndMinute !== "";
+
+    const hasFullTime =
+      this.selectedStartHour !== "" &&
+      this.selectedStartMinute !== "" &&
+      this.selectedEndHour !== "" &&
+      this.selectedEndMinute !== "";
+
+    if(hasPartialTime && !hasFullTime){
+      alert("Completá tanto la hora de inicio como la hora de fin");
+      return;
+    }
+
+    let timeStart = "";
+    let timeEnd = "";
+    let timeLabel = "";
+
+    if(hasFullTime){
+      timeStart = `${this.selectedStartHour}:${this.selectedStartMinute}`;
+      timeEnd = `${this.selectedEndHour}:${this.selectedEndMinute}`;
+      timeLabel = `${timeStart} - ${timeEnd}`;
+
+      const startTotal = Number(this.selectedStartHour) * 60 + Number(this.selectedStartMinute);
+      const endTotal = Number(this.selectedEndHour) * 60 + Number(this.selectedEndMinute);
+
+      if(endTotal <= startTotal){
+        alert("La hora de fin tiene que ser mayor que la hora de inicio");
+        return;
+      }
+    }
+
+    const id = Date.now().toString();
+    const days = selected.map(cb => cb.value);
+
+    const habit = {
+      id,
+      text,
+      days,
+      timeStart,
+      timeEnd,
+      timeLabel
+    };
+
+    this.habits.push(habit);
     this.save();
     this.render();
+    this.resetTaskForm();
 
-    document.getElementById("taskInput").value="";
-    this.selectedHour="";
-    this.selectedMinute="";
-    document.getElementById("timeDisplay").innerText="Seleccionar horario";
-    document.getElementById("timeDisplay").classList.remove("has-time");
+    if(!timeStart){
+      return;
+    }
 
-    document.querySelectorAll(".time-item").forEach(i=>i.classList.remove("active"));
-    document.querySelectorAll(".days-selector input").forEach(i=>i.checked=false);
+    try{
+      const [h, m] = timeStart.split(":").map(Number);
+
+      for(const day of days){
+        const reminderAt = this.getNextReminderTimestamp(day, h, m, 30);
+
+        await db.collection("reminders").add({
+          habitId: id,
+          text,
+          timeStart,
+          timeEnd,
+          timeLabel,
+          day,
+          reminderAt,
+          sent: false,
+          createdAt: Date.now()
+        });
+      }
+    }catch(error){
+      console.error("No se pudieron guardar los recordatorios en Firestore:", error);
+    }
+  }
+
+  getNextReminderTimestamp(dayName, hour, minute, offsetMinutes = 30){
+    const dayMap = {
+      sunday: 0,
+      monday: 1,
+      tuesday: 2,
+      wednesday: 3,
+      thursday: 4,
+      friday: 5,
+      saturday: 6
+    };
+
+    const now = new Date();
+    const targetDay = dayMap[dayName];
+    const reminderDate = new Date(now);
+
+    const currentDay = reminderDate.getDay();
+    let diff = targetDay - currentDay;
+
+    if(diff < 0) diff += 7;
+
+    reminderDate.setDate(reminderDate.getDate() + diff);
+    reminderDate.setHours(hour, minute, 0, 0);
+    reminderDate.setMinutes(reminderDate.getMinutes() - offsetMinutes);
+
+    if(reminderDate.getTime() <= now.getTime()){
+      reminderDate.setDate(reminderDate.getDate() + 7);
+    }
+
+    return reminderDate.getTime();
   }
 
   deleteHabit(id){
-    this.habits=this.habits.filter(h=>h.id!==id);
+    this.habits = this.habits.filter(h => h.id !== id);
     this.save();
     this.render();
   }
 
-  setStatus(id,day,status){
-    const key=this.getWeekKey();
-    if(!this.progress[key])this.progress[key]={};
-    if(!this.progress[key][id])this.progress[key][id]={};
-    this.progress[key][id][day]=status;
+  setStatus(id, day, status){
+    const key = this.getWeekKey();
+
+    if(!this.progress[key]) this.progress[key] = {};
+    if(!this.progress[key][id]) this.progress[key][id] = {};
+
+    this.progress[key][id][day] = status;
     this.save();
     this.render();
   }
 
-  getStatus(id,day){
-    const key=this.getWeekKey();
-    return this.progress?.[key]?.[id]?.[day]||"";
+  getStatus(id, day){
+    const key = this.getWeekKey();
+    return this.progress?.[key]?.[id]?.[day] || "";
   }
 
-  createTaskElement(h,day){
-    const task=document.createElement("div");
-    const status=this.getStatus(h.id,day);
+  createTaskElement(h, day){
+    const task = document.createElement("div");
+    const status = this.getStatus(h.id, day);
+    const timeLabel = this.getTimeLabel(h);
 
-    task.className="task";
-    if(status==="done") task.classList.add("done");
-    if(status==="failed") task.classList.add("failed");
+    task.className = "task";
+    if(status === "done") task.classList.add("done");
+    if(status === "failed") task.classList.add("failed");
 
-    task.innerHTML=`
+    task.innerHTML = `
       <div class="task-left">
         <span class="task-name">${h.text}</span>
-        ${h.time?`<span class="time-badge">${h.time}</span>`:""}
+        ${timeLabel ? `<span class="time-badge">${timeLabel}</span>` : ""}
       </div>
 
       <div class="status-actions">
-        <button class="status-btn done ${status==="done"?"active":""}" aria-label="Hecho">✓</button>
-        <button class="status-btn fail ${status==="failed"?"active":""}" aria-label="No hecho">✕</button>
+        <button class="status-btn done ${status === "done" ? "active" : ""}" aria-label="Hecho">✓</button>
+        <button class="status-btn fail ${status === "failed" ? "active" : ""}" aria-label="No hecho">✕</button>
         <button class="delete-btn" aria-label="Eliminar">✕</button>
       </div>
     `;
 
-    const doneBtn=task.querySelector(".status-btn.done");
-    const failBtn=task.querySelector(".status-btn.fail");
-    const deleteBtn=task.querySelector(".delete-btn");
+    const doneBtn = task.querySelector(".status-btn.done");
+    const failBtn = task.querySelector(".status-btn.fail");
+    const deleteBtn = task.querySelector(".delete-btn");
 
-    doneBtn.addEventListener("click",()=>{
-      const current=this.getStatus(h.id,day);
-      this.setStatus(h.id,day,current==="done"?"":"done");
+    doneBtn.addEventListener("click", () => {
+      const current = this.getStatus(h.id, day);
+      this.setStatus(h.id, day, current === "done" ? "" : "done");
     });
 
-    failBtn.addEventListener("click",()=>{
-      const current=this.getStatus(h.id,day);
-      this.setStatus(h.id,day,current==="failed"?"":"failed");
+    failBtn.addEventListener("click", () => {
+      const current = this.getStatus(h.id, day);
+      this.setStatus(h.id, day, current === "failed" ? "" : "failed");
     });
 
-    deleteBtn.addEventListener("click",()=>this.deleteHabit(h.id));
+    deleteBtn.addEventListener("click", () => this.deleteHabit(h.id));
 
     return task;
   }
 
   render(){
-    const start=this.getWeekStart(this.currentDate);
-    const end=new Date(start);
-    end.setDate(start.getDate()+6);
+    const start = this.getWeekStart(this.currentDate);
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
 
-    document.getElementById("weekLabel").innerText=
+    document.getElementById("weekLabel").innerText =
       `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`;
 
-    const container=document.getElementById("weekContainer");
-    container.innerHTML="";
+    const container = document.getElementById("weekContainer");
+    container.innerHTML = "";
 
-    Object.keys(this.labels).forEach((day,index)=>{
-      const div=document.createElement("div");
-      div.className="day";
+    Object.keys(this.labels).forEach((day, index) => {
+      const div = document.createElement("div");
+      div.className = "day";
 
-      const dateForDay=new Date(start);
-      dateForDay.setDate(start.getDate()+index);
+      const dateForDay = new Date(start);
+      dateForDay.setDate(start.getDate() + index);
 
-      div.innerHTML=`
+      div.innerHTML = `
         <div class="day-header">
           <div class="day-title">${this.labels[day]}</div>
           <div class="day-date">${dateForDay.toLocaleDateString()}</div>
         </div>
       `;
 
-      const tasks=this.habits
-        .filter(h=>h.days.includes(day))
-        .sort((a,b)=>(a.time||"").localeCompare(b.time||""));
+      const tasks = this.habits
+        .filter(h => h.days.includes(day))
+        .sort((a, b) => this.getTimeLabel(a).localeCompare(this.getTimeLabel(b)));
 
-      if(tasks.length===0){
-        const empty=document.createElement("div");
-        empty.className="empty-day";
-        empty.textContent="No hay tareas para este día";
+      if(tasks.length === 0){
+        const empty = document.createElement("div");
+        empty.className = "empty-day";
+        empty.textContent = "No hay tareas para este día";
         div.appendChild(empty);
       }
 
-      tasks.forEach(h=>{
-        div.appendChild(this.createTaskElement(h,day));
+      tasks.forEach(h => {
+        div.appendChild(this.createTaskElement(h, day));
       });
 
       container.appendChild(div);
@@ -1044,44 +1339,45 @@ class App{
   }
 
   drawProgress(){
-    const key=this.getWeekKey();
-    const week=this.progress[key]||{};
+    const key = this.getWeekKey();
+    const week = this.progress[key] || {};
 
-    let done=0;
-    let failed=0;
-    let total=0;
+    let done = 0;
+    let failed = 0;
+    let total = 0;
 
-    this.habits.forEach(habit=>{
-      Object.keys(this.labels).forEach(day=>{
+    this.habits.forEach(habit => {
+      Object.keys(this.labels).forEach(day => {
         if(habit.days.includes(day)){
           total++;
-          const status=week?.[habit.id]?.[day]||"";
-          if(status==="done") done++;
-          if(status==="failed") failed++;
+          const status = week?.[habit.id]?.[day] || "";
+          if(status === "done") done++;
+          if(status === "failed") failed++;
         }
       });
     });
 
-    const pending=Math.max(total-done-failed,0);
-    const percent=total?Math.round((done/total)*100):0;
+    const pending = Math.max(total - done - failed, 0);
+    const percent = total ? Math.round((done / total) * 100) : 0;
 
-    document.getElementById("percentage").innerText=percent+"%";
-    document.getElementById("doneCount").innerText=done;
-    document.getElementById("failedCount").innerText=failed;
-    document.getElementById("pendingCount").innerText=pending;
+    document.getElementById("percentage").innerText = percent + "%";
+    document.getElementById("doneCount").innerText = done;
+    document.getElementById("failedCount").innerText = failed;
+    document.getElementById("pendingCount").innerText = pending;
 
-    const bar=document.getElementById("progressBar");
-    requestAnimationFrame(()=>{
-      bar.style.width=percent+"%";
+    const bar = document.getElementById("progressBar");
+    requestAnimationFrame(() => {
+      bar.style.width = percent + "%";
     });
   }
 }
 
-const app=new App();
+const app = new App();
 </script>
 
 </body>
 </html>
+
 
 
 
