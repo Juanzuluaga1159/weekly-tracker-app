@@ -157,6 +157,10 @@ body::after{
   font-weight:700;
 }
 
+.desktop-calendar{
+  display:block;
+}
+
 .calendar-wrap{
   overflow:auto;
   border-radius:18px;
@@ -256,8 +260,8 @@ tbody tr:last-child td{
   width:100%;
   text-align:left;
   color:white;
-  border-radius:10px;
-  padding:7px;
+  border-radius:12px;
+  padding:8px;
   font-size:11px;
   line-height:1.15;
   box-shadow:0 10px 20px rgba(0,0,0,.22);
@@ -286,6 +290,97 @@ tbody tr:last-child td{
   font-size:10px;
   opacity:.94;
   color:rgba(255,255,255,.92);
+}
+
+.mobile-week{
+  display:none;
+}
+
+.mobile-day-card{
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  border-radius:22px;
+  padding:14px;
+  margin-bottom:14px;
+  box-shadow:0 12px 28px rgba(0,0,0,.20);
+}
+
+.mobile-day-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px;
+}
+
+.mobile-day-title{
+  font-size:18px;
+  font-weight:800;
+}
+
+.mobile-day-date{
+  font-size:12px;
+  color:var(--muted);
+  padding:7px 10px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.06);
+  white-space:nowrap;
+}
+
+.mobile-day-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.mobile-task{
+  width:100%;
+  border:none;
+  border-radius:18px;
+  padding:14px;
+  color:white;
+  text-align:left;
+  cursor:pointer;
+  box-shadow:0 12px 24px rgba(0,0,0,.22);
+}
+
+.mobile-task-top{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.mobile-task-title{
+  font-size:16px;
+  font-weight:800;
+  line-height:1.2;
+  word-break:break-word;
+  flex:1;
+}
+
+.mobile-task-time{
+  margin-top:8px;
+  font-size:13px;
+  color:rgba(255,255,255,.92);
+  font-weight:600;
+}
+
+.mobile-task-badge{
+  flex-shrink:0;
+  font-size:11px;
+  font-weight:800;
+  padding:7px 9px;
+  border-radius:999px;
+  background:rgba(255,255,255,.16);
+  border:1px solid rgba(255,255,255,.18);
+}
+
+.mobile-empty{
+  font-size:14px;
+  color:#8b8b8b;
+  padding:8px 2px 2px;
 }
 
 .legend{
@@ -438,6 +533,20 @@ tbody tr:last-child td{
   border-color:transparent;
 }
 
+@media (max-width:900px){
+  .desktop-calendar{
+    display:none;
+  }
+
+  .mobile-week{
+    display:block;
+  }
+
+  .legend{
+    margin-top:16px;
+  }
+}
+
 @media (max-width:700px){
   body{
     padding:16px 12px 24px;
@@ -447,23 +556,58 @@ tbody tr:last-child td{
     font-size:26px;
   }
 
+  .page-subtitle{
+    font-size:15px;
+    line-height:1.4;
+    margin-bottom:16px;
+  }
+
   .card{
-    padding:12px;
+    padding:14px;
+    border-radius:22px;
+  }
+
+  .week-nav{
+    gap:10px;
+  }
+
+  .week-nav-top button{
+    padding:14px 12px;
+    font-size:15px;
+  }
+
+  .week-label{
+    font-size:14px;
+  }
+
+  .mobile-day-card{
+    padding:14px;
     border-radius:20px;
   }
 
-  .cell{
-    min-width:98px;
-    height:52px;
+  .mobile-day-title{
+    font-size:18px;
   }
 
-  .task{
-    padding:6px;
-    font-size:10px;
+  .mobile-day-date{
+    font-size:12px;
   }
 
-  .task-time{
-    font-size:9px;
+  .mobile-task{
+    padding:16px;
+    border-radius:18px;
+  }
+
+  .mobile-task-title{
+    font-size:17px;
+  }
+
+  .mobile-task-time{
+    font-size:14px;
+  }
+
+  .mobile-empty{
+    font-size:15px;
   }
 
   .color-grid{
@@ -480,7 +624,7 @@ tbody tr:last-child td{
   </div>
 
   <h1 class="page-title">Planner semanal</h1>
-  <p class="page-subtitle">Acá se reflejan automáticamente las tareas cargadas en el tracker. Tocá una tarea para cambiarle el color.</p>
+  <p class="page-subtitle">En celular vas a ver una semana más cómoda en tarjetas. Tocá una tarea para cambiarle el color.</p>
 
   <div class="card">
     <div class="week-nav">
@@ -491,16 +635,20 @@ tbody tr:last-child td{
       <div class="week-label" id="weekLabel"></div>
     </div>
 
-    <div class="calendar-wrap">
-      <table id="calendar">
-        <thead>
-          <tr id="calendarHeadRow">
-            <th class="time-col">Hora</th>
-          </tr>
-        </thead>
-        <tbody id="calendarBody"></tbody>
-      </table>
+    <div class="desktop-calendar">
+      <div class="calendar-wrap">
+        <table id="calendar">
+          <thead>
+            <tr id="calendarHeadRow">
+              <th class="time-col">Hora</th>
+            </tr>
+          </thead>
+          <tbody id="calendarBody"></tbody>
+        </table>
+      </div>
     </div>
+
+    <div class="mobile-week" id="mobileWeek"></div>
 
     <div class="legend">
       <div class="legend-item">
@@ -554,13 +702,13 @@ const dayMap = {
 };
 
 const orderedDays = [
-  { key:"monday", short:"L" },
-  { key:"tuesday", short:"M" },
-  { key:"wednesday", short:"X" },
-  { key:"thursday", short:"J" },
-  { key:"friday", short:"V" },
-  { key:"saturday", short:"S" },
-  { key:"sunday", short:"D" }
+  { key:"monday", short:"L", label:"Lunes" },
+  { key:"tuesday", short:"M", label:"Martes" },
+  { key:"wednesday", short:"X", label:"Miércoles" },
+  { key:"thursday", short:"J", label:"Jueves" },
+  { key:"friday", short:"V", label:"Viernes" },
+  { key:"saturday", short:"S", label:"Sábado" },
+  { key:"sunday", short:"D", label:"Domingo" }
 ];
 
 const colorOptions = [
@@ -585,6 +733,7 @@ const colorGrid = document.getElementById("colorGrid");
 const colorPreview = document.getElementById("colorPreview");
 const colorPreviewText = document.getElementById("colorPreviewText");
 const colorPreviewTime = document.getElementById("colorPreviewTime");
+const mobileWeek = document.getElementById("mobileWeek");
 
 let currentDate = new Date();
 let selectedHabitId = null;
@@ -666,7 +815,6 @@ function getWeekStart(date){
 function getWeekRangeLabel(start){
   const end = new Date(start);
   end.setDate(start.getDate() + 6);
-
   return `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`;
 }
 
@@ -678,6 +826,13 @@ function getDateForColumn(index){
 }
 
 function formatColumnDate(date){
+  return date.toLocaleDateString("es-AR", {
+    day:"2-digit",
+    month:"2-digit"
+  });
+}
+
+function formatLongDate(date){
   return date.toLocaleDateString("es-AR", {
     day:"2-digit",
     month:"2-digit"
@@ -750,7 +905,7 @@ function createTaskElement(habit, isNoTime = false){
 
   const button = document.createElement("button");
   button.type = "button";
-  button.className = `task${isNoTime ? " no-time" : ""}`;
+  button.className = "task";
   button.dataset.habitId = habit.id || "";
   button.style.background = `linear-gradient(180deg, ${color.start}, ${color.end})`;
 
@@ -766,6 +921,43 @@ function createTaskElement(habit, isNoTime = false){
     time.textContent = timeData.label;
     button.appendChild(time);
   }
+
+  button.addEventListener("click", () => {
+    openColorModal(habit);
+  });
+
+  return button;
+}
+
+function createMobileTaskElement(habit, isNoTime = false){
+  const timeData = getHabitTimeData(habit);
+  const color = getHabitColor(habit, isNoTime);
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "mobile-task";
+  button.dataset.habitId = habit.id || "";
+  button.style.background = `linear-gradient(180deg, ${color.start}, ${color.end})`;
+
+  const top = document.createElement("div");
+  top.className = "mobile-task-top";
+
+  const title = document.createElement("div");
+  title.className = "mobile-task-title";
+  title.textContent = typeof habit.text === "string" && habit.text.trim() ? habit.text.trim() : "Tarea";
+
+  const badge = document.createElement("div");
+  badge.className = "mobile-task-badge";
+  badge.textContent = isNoTime ? "Sin hora" : "Horario";
+
+  top.appendChild(title);
+  top.appendChild(badge);
+  button.appendChild(top);
+
+  const time = document.createElement("div");
+  time.className = "mobile-task-time";
+  time.textContent = timeData.label || "Sin horario";
+  button.appendChild(time);
 
   button.addEventListener("click", () => {
     openColorModal(habit);
@@ -862,10 +1054,76 @@ function renderHabitsInCalendar(){
   });
 }
 
+function getSortedHabitsForDay(dayKey){
+  const habits = getHabits().filter(habit => Array.isArray(habit.days) && habit.days.includes(dayKey));
+
+  habits.sort((a, b) => {
+    const timeA = getHabitTimeData(a).start || "99:99";
+    const timeB = getHabitTimeData(b).start || "99:99";
+    return timeA.localeCompare(timeB);
+  });
+
+  return habits;
+}
+
+function renderMobileWeek(){
+  mobileWeek.innerHTML = "";
+
+  const habits = getHabits();
+  if(habits.length === 0){
+    const empty = document.createElement("div");
+    empty.className = "empty-state";
+    empty.textContent = "Todavía no hay tareas cargadas en el tracker.";
+    mobileWeek.appendChild(empty);
+    return;
+  }
+
+  orderedDays.forEach((day, index) => {
+    const card = document.createElement("div");
+    card.className = "mobile-day-card";
+
+    const head = document.createElement("div");
+    head.className = "mobile-day-head";
+
+    const title = document.createElement("div");
+    title.className = "mobile-day-title";
+    title.textContent = day.label;
+
+    const date = document.createElement("div");
+    date.className = "mobile-day-date";
+    date.textContent = formatLongDate(getDateForColumn(index));
+
+    head.appendChild(title);
+    head.appendChild(date);
+    card.appendChild(head);
+
+    const list = document.createElement("div");
+    list.className = "mobile-day-list";
+
+    const dayHabits = getSortedHabitsForDay(day.key);
+
+    if(dayHabits.length === 0){
+      const empty = document.createElement("div");
+      empty.className = "mobile-empty";
+      empty.textContent = "No hay tareas para este día";
+      list.appendChild(empty);
+    }else{
+      dayHabits.forEach(habit => {
+        const isNoTime = !getHabitTimeData(habit).start;
+        list.appendChild(createMobileTaskElement(habit, isNoTime));
+      });
+    }
+
+    card.appendChild(list);
+    mobileWeek.appendChild(card);
+  });
+}
+
 function renderCalendar(){
   buildHeader();
   buildBaseGrid();
   renderHabitsInCalendar();
+  renderMobileWeek();
 }
 
 function changeWeek(offset){
