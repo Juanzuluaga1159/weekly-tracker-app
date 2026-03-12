@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planner semanal</title>
+
+<style>
+:root{
+  --bg:#030303;
+  --card:rgba(255,255,255,0.04);
+  --border:rgba(255,255,255,0.08);
+  --text:#f5f5f5;
+  --muted:#a3a3a3;
+  --primary:#dc2626;
+  --primary-dark:#991b1b;
+  --shadow:0 18px 40px rgba(0,0,0,.40);
+}
+
+*{
+  box-sizing:border-box;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+html,body{
+  margin:0;
+  padding:0;
+  background:var(--bg);
+  color:var(--text);
+}
+
+body{
+  min-height:100vh;
+  padding:18px 14px 30px;
+  position:relative;
+  overflow-x:hidden;
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  top:-120px;
+  left:-100px;
+  width:280px;
+  height:280px;
+  background:#dc2626;
+  opacity:.13;
+  filter:blur(120px);
+  pointer-events:none;
+  z-index:0;
+}
+
+body::after{
+  content:"";
+  position:fixed;
+  right:-120px;
+  bottom:-140px;
+  width:320px;
+  height:320px;
+  background:#7f1d1d;
+  opacity:.14;
+  filter:blur(140px);
+  pointer-events:none;
+  z-index:0;
+}
+
+.container{
+  position:relative;
+  z-index:1;
+  max-width:1400px;
+  margin:0 auto;
+}
+
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  margin-bottom:14px;
+}
+
+.back{
+  padding:10px 16px;
+  border-radius:14px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,0.05);
+  color:white;
+  cursor:pointer;
+  font-weight:700;
+  font-size:13px;
+  transition:.2s;
+  box-shadow:0 10px 24px rgba(0,0,0,.22);
+}
+
+.back:hover{
+  transform:translateY(-1px);
+  border-color:rgba(220,38,38,.28);
+}
+
+.page-title{
+  margin:4px 0 8px;
+  font-size:30px;
+  font-weight:800;
+  text-align:center;
+  letter-spacing:.3px;
+  text-shadow:0 0 18px rgba(220,38,38,.25);
+}
+
+.page-subtitle{
+  margin:0 0 18px;
+  text-align:center;
+  color:var(--muted);
+  font-size:14px;
+}
+
+.card{
+  background:linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.03));
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:16px;
+  backdrop-filter:blur(18px);
+  box-shadow:var(--shadow);
+}
+
+.week-nav{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  margin-bottom:16px;
+}
+
+.week-nav-top{
+  display:flex;
+  gap:10px;
+}
+
+.week-nav-top button{
+  flex:1;
+  padding:13px;
+  border-radius:14px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid var(--border);
+  color:white;
+  font-weight:700;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.week-nav-top button:hover{
+  transform:translateY(-1px);
+  border-color:rgba(220,38,38,.28);
+}
+
+.week-label{
+  text-align:center;
+  font-size:13px;
+  color:var(--muted);
+  font-weight:700;
+}
+
+.calendar-wrap{
+  overflow:auto;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,0.05);
+  max-height:80vh;
+}
+
+table{
+  width:100%;
+  min-width:980px;
+  border-collapse:separate;
+  border-spacing:0;
+  background:rgba(255,255,255,0.02);
+}
+
+thead th{
+  position:sticky;
+  top:0;
+  z-index:3;
+  background:#090909;
+  color:#fff;
+  font-size:13px;
+  font-weight:800;
+  padding:12px 8px;
+  border-bottom:1px solid var(--border);
+}
+
+.day-head{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:3px;
+}
+
+.day-short{
+  font-size:13px;
+  font-weight:800;
+}
+
+.day-date{
+  font-size:11px;
+  color:#a3a3a3;
+  font-weight:600;
+}
+
+th,td{
+  border-right:1px solid rgba(255,255,255,0.05);
+  border-bottom:1px solid rgba(255,255,255,0.05);
+  text-align:center;
+  vertical-align:top;
+}
+
+th:first-child,
+td:first-child{
+  border-left:1px solid rgba(255,255,255,0.05);
+}
+
+tbody tr:last-child td{
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+
+.time-col{
+  width:92px;
+  min-width:92px;
+  background:#080808;
+  color:#d4d4d4;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.2px;
+  padding:8px 8px;
+  position:sticky;
+  left:0;
+  z-index:2;
+}
+
+.no-time-row .time-col{
+  color:#fca5a5;
+}
+
+.cell{
+  width:calc((100% - 92px) / 7);
+  min-width:120px;
+  height:54px;
+  padding:3px;
+  background:rgba(255,255,255,0.02);
+}
+
+.cell.empty{
+  background:rgba(255,255,255,0.015);
+}
+
+.task{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:4px;
+  width:100%;
+  text-align:left;
+  color:white;
+  border-radius:10px;
+  padding:7px;
+  font-size:11px;
+  line-height:1.15;
+  box-shadow:0 10px 20px rgba(0,0,0,.22);
+  margin-bottom:0;
+  cursor:pointer;
+  border:none;
+  transition:transform .15s ease, filter .15s ease, box-shadow .15s ease;
+}
+
+.task:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.04);
+  box-shadow:0 14px 24px rgba(0,0,0,.28);
+}
+
+.task:active{
+  transform:scale(.98);
+}
+
+.task-title{
+  font-weight:800;
+  word-break:break-word;
+}
+
+.task-time{
+  font-size:10px;
+  opacity:.94;
+  color:rgba(255,255,255,.92);
+}
+
+.legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:14px;
+}
+
+.legend-item{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 12px;
+  border-radius:14px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  font-size:12px;
+  color:var(--muted);
+}
+
+.legend-dot{
+  width:12px;
+  height:12px;
+  border-radius:999px;
+}
+
+.legend-dot.range{
+  background:linear-gradient(180deg,#dc2626,#991b1b);
+}
+
+.legend-dot.no-time{
+  background:linear-gradient(180deg,#7f1d1d,#450a0a);
+}
+
+.legend-dot.edit{
+  background:linear-gradient(180deg,#2563eb,#1d4ed8);
+}
+
+.empty-state{
+  padding:24px 14px;
+  text-align:center;
+  color:#737373;
+  font-size:14px;
+}
+
+.color-modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,.72);
+  z-index:999;
+  padding:18px;
+}
+
+.color-panel{
+  width:100%;
+  max-width:420px;
+  background:#090909;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:24px;
+  padding:18px;
+  box-shadow:0 18px 40px rgba(0,0,0,.45);
+}
+
+.color-title{
+  margin:0 0 6px;
+  font-size:18px;
+  font-weight:800;
+}
+
+.color-subtitle{
+  margin:0 0 16px;
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.4;
+}
+
+.color-preview{
+  border-radius:16px;
+  padding:14px;
+  color:white;
+  font-weight:800;
+  margin-bottom:14px;
+  box-shadow:0 12px 24px rgba(0,0,0,.24);
+}
+
+.color-preview small{
+  display:block;
+  margin-top:4px;
+  font-size:12px;
+  font-weight:600;
+  opacity:.92;
+}
+
+.color-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-bottom:16px;
+}
+
+.color-swatch{
+  border:none;
+  height:56px;
+  border-radius:16px;
+  cursor:pointer;
+  position:relative;
+  transition:.18s;
+  box-shadow:0 10px 20px rgba(0,0,0,.20);
+}
+
+.color-swatch:hover{
+  transform:translateY(-1px);
+}
+
+.color-swatch.active::after{
+  content:"✓";
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-weight:900;
+  font-size:18px;
+  text-shadow:0 2px 10px rgba(0,0,0,.45);
+}
+
+.modal-actions{
+  display:flex;
+  gap:10px;
+}
+
+.modal-btn{
+  flex:1;
+  padding:13px 14px;
+  border-radius:14px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,0.05);
+  color:white;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.modal-btn.primary{
+  background:linear-gradient(90deg,#dc2626,#991b1b);
+  border-color:transparent;
+}
+
+@media (max-width:700px){
+  body{
+    padding:16px 12px 24px;
+  }
+
+  .page-title{
+    font-size:26px;
+  }
+
+  .card{
+    padding:12px;
+    border-radius:20px;
+  }
+
+  .cell{
+    min-width:98px;
+    height:52px;
+  }
+
+  .task{
+    padding:6px;
+    font-size:10px;
+  }
+
+  .task-time{
+    font-size:9px;
+  }
+
+  .color-grid{
+    grid-template-columns:repeat(3,1fr);
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+  <div class="topbar">
+    <button class="back" onclick="goBack()">← Menú</button>
+  </div>
+
+  <h1 class="page-title">Planner semanal</h1>
+  <p class="page-subtitle">Acá se reflejan automáticamente las tareas cargadas en el tracker. Tocá una tarea para cambiarle el color.</p>
+
+  <div class="card">
+    <div class="week-nav">
+      <div class="week-nav-top">
+        <button id="prevWeekBtn">Anterior</button>
+        <button id="nextWeekBtn">Siguiente</button>
+      </div>
+      <div class="week-label" id="weekLabel"></div>
+    </div>
+
+    <div class="calendar-wrap">
+      <table id="calendar">
+        <thead>
+          <tr id="calendarHeadRow">
+            <th class="time-col">Hora</th>
+          </tr>
+        </thead>
+        <tbody id="calendarBody"></tbody>
+      </table>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item">
+        <span class="legend-dot range"></span>
+        <span>Tareas con horario o rango</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot no-time"></span>
+        <span>Tareas sin horario</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot edit"></span>
+        <span>Tocá una tarea para cambiar color</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="color-modal" id="colorModal">
+  <div class="color-panel">
+    <h3 class="color-title">Cambiar color</h3>
+    <p class="color-subtitle">El color se va a aplicar a todas las apariciones de esta misma tarea.</p>
+
+    <div class="color-preview" id="colorPreview">
+      <span id="colorPreviewText">Tarea</span>
+      <small id="colorPreviewTime"></small>
+    </div>
+
+    <div class="color-grid" id="colorGrid"></div>
+
+    <div class="modal-actions">
+      <button class="modal-btn" id="cancelColorBtn">Cancelar</button>
+      <button class="modal-btn primary" id="saveColorBtn">Guardar color</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function goBack(){
+  window.location.href = "index.html";
+}
+
+const dayMap = {
+  monday: 0,
+  tuesday: 1,
+  wednesday: 2,
+  thursday: 3,
+  friday: 4,
+  saturday: 5,
+  sunday: 6
+};
+
+const orderedDays = [
+  { key:"monday", short:"L" },
+  { key:"tuesday", short:"M" },
+  { key:"wednesday", short:"X" },
+  { key:"thursday", short:"J" },
+  { key:"friday", short:"V" },
+  { key:"saturday", short:"S" },
+  { key:"sunday", short:"D" }
+];
+
+const colorOptions = [
+  { id:"red", start:"#dc2626", end:"#991b1b" },
+  { id:"blue", start:"#2563eb", end:"#1d4ed8" },
+  { id:"green", start:"#16a34a", end:"#166534" },
+  { id:"purple", start:"#9333ea", end:"#6b21a8" },
+  { id:"orange", start:"#ea580c", end:"#c2410c" },
+  { id:"pink", start:"#db2777", end:"#9d174d" },
+  { id:"teal", start:"#0f766e", end:"#115e59" },
+  { id:"gray", start:"#4b5563", end:"#1f2937" }
+];
+
+const defaultTimedColor = { start:"#dc2626", end:"#991b1b" };
+const defaultNoTimeColor = { start:"#7f1d1d", end:"#450a0a" };
+
+const calendarBody = document.getElementById("calendarBody");
+const calendarHeadRow = document.getElementById("calendarHeadRow");
+const weekLabel = document.getElementById("weekLabel");
+const colorModal = document.getElementById("colorModal");
+const colorGrid = document.getElementById("colorGrid");
+const colorPreview = document.getElementById("colorPreview");
+const colorPreviewText = document.getElementById("colorPreviewText");
+const colorPreviewTime = document.getElementById("colorPreviewTime");
+
+let currentDate = new Date();
+let selectedHabitId = null;
+let selectedColorId = null;
+
+function pad(value){
+  return String(value).padStart(2, "0");
+}
+
+function formatTimeLabelFromMinutes(totalMinutes){
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${pad(hours)}:${pad(minutes)}`;
+}
+
+function getHalfHourSlots(){
+  const slots = [];
+  for(let minutes = 0; minutes < 24 * 60; minutes += 30){
+    slots.push(formatTimeLabelFromMinutes(minutes));
+  }
+  return slots;
+}
+
+function parseTimeToMinutes(time){
+  if(!time || typeof time !== "string" || !time.includes(":")) return null;
+
+  const [h, m] = time.split(":").map(Number);
+  if(Number.isNaN(h) || Number.isNaN(m)) return null;
+
+  return h * 60 + m;
+}
+
+function getHabitTimeData(habit){
+  if(habit.timeStart && habit.timeEnd){
+    return {
+      start: habit.timeStart,
+      end: habit.timeEnd,
+      label: habit.timeLabel || `${habit.timeStart} - ${habit.timeEnd}`
+    };
+  }
+
+  if(habit.time){
+    return {
+      start: habit.time,
+      end: null,
+      label: habit.time
+    };
+  }
+
+  return {
+    start: "",
+    end: "",
+    label: ""
+  };
+}
+
+function getHabits(){
+  try{
+    const habits = JSON.parse(localStorage.getItem("habits")) || [];
+    return Array.isArray(habits) ? habits : [];
+  }catch(error){
+    console.error("Error leyendo habits desde localStorage:", error);
+    return [];
+  }
+}
+
+function saveHabits(habits){
+  localStorage.setItem("habits", JSON.stringify(habits));
+}
+
+function getWeekStart(date){
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - ((day + 6) % 7);
+  d.setHours(0, 0, 0, 0);
+  return new Date(d.setDate(diff));
+}
+
+function getWeekRangeLabel(start){
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+
+  return `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`;
+}
+
+function getDateForColumn(index){
+  const start = getWeekStart(currentDate);
+  const date = new Date(start);
+  date.setDate(start.getDate() + index);
+  return date;
+}
+
+function formatColumnDate(date){
+  return date.toLocaleDateString("es-AR", {
+    day:"2-digit",
+    month:"2-digit"
+  });
+}
+
+function buildHeader(){
+  calendarHeadRow.innerHTML = `<th class="time-col">Hora</th>`;
+
+  orderedDays.forEach((day, index) => {
+    const date = getDateForColumn(index);
+    const th = document.createElement("th");
+    th.innerHTML = `
+      <div class="day-head">
+        <span class="day-short">${day.short}</span>
+        <span class="day-date">${formatColumnDate(date)}</span>
+      </div>
+    `;
+    calendarHeadRow.appendChild(th);
+  });
+
+  weekLabel.textContent = getWeekRangeLabel(getWeekStart(currentDate));
+}
+
+function clearCalendar(){
+  calendarBody.innerHTML = "";
+}
+
+function createRow(timeLabel, rowClass = ""){
+  const row = document.createElement("tr");
+  if(rowClass) row.className = rowClass;
+
+  const timeCell = document.createElement("td");
+  timeCell.className = "time-col";
+  timeCell.textContent = timeLabel;
+  row.appendChild(timeCell);
+
+  for(let i = 0; i < 7; i++){
+    const cell = document.createElement("td");
+    cell.className = "cell empty";
+    cell.dataset.day = String(i);
+    cell.dataset.time = timeLabel;
+    row.appendChild(cell);
+  }
+
+  calendarBody.appendChild(row);
+}
+
+function buildBaseGrid(){
+  clearCalendar();
+  createRow("Sin hora", "no-time-row");
+
+  const slots = getHalfHourSlots();
+  slots.forEach(slot => createRow(slot));
+}
+
+function getColorById(colorId, isNoTime = false){
+  const match = colorOptions.find(color => color.id === colorId);
+  if(match) return match;
+  return isNoTime ? defaultNoTimeColor : defaultTimedColor;
+}
+
+function getHabitColor(habit, isNoTime = false){
+  return getColorById(habit.color || "", isNoTime);
+}
+
+function createTaskElement(habit, isNoTime = false){
+  const timeData = getHabitTimeData(habit);
+  const color = getHabitColor(habit, isNoTime);
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = `task${isNoTime ? " no-time" : ""}`;
+  button.dataset.habitId = habit.id || "";
+  button.style.background = `linear-gradient(180deg, ${color.start}, ${color.end})`;
+
+  const title = document.createElement("div");
+  title.className = "task-title";
+  title.textContent = typeof habit.text === "string" && habit.text.trim() ? habit.text.trim() : "Tarea";
+
+  button.appendChild(title);
+
+  if(timeData.label){
+    const time = document.createElement("div");
+    time.className = "task-time";
+    time.textContent = timeData.label;
+    button.appendChild(time);
+  }
+
+  button.addEventListener("click", () => {
+    openColorModal(habit);
+  });
+
+  return button;
+}
+
+function addTaskToCell(dayIndex, timeLabel, taskElement){
+  const cell = document.querySelector(`td.cell[data-day="${dayIndex}"][data-time="${timeLabel}"]`);
+  if(!cell) return;
+
+  cell.classList.remove("empty");
+  cell.appendChild(taskElement);
+}
+
+function getCoveredTimeLabels(habit){
+  const timeData = getHabitTimeData(habit);
+
+  if(!timeData.start){
+    return [];
+  }
+
+  const startMinutes = parseTimeToMinutes(timeData.start);
+  if(startMinutes === null){
+    return [];
+  }
+
+  if(!timeData.end){
+    const roundedStart = Math.floor(startMinutes / 30) * 30;
+    return [formatTimeLabelFromMinutes(roundedStart)];
+  }
+
+  const endMinutes = parseTimeToMinutes(timeData.end);
+  if(endMinutes === null || endMinutes < startMinutes){
+    const roundedStart = Math.floor(startMinutes / 30) * 30;
+    return [formatTimeLabelFromMinutes(roundedStart)];
+  }
+
+  const covered = [];
+  let effectiveEndMinutes = endMinutes;
+
+  if(endMinutes % 30 === 0){
+    effectiveEndMinutes += 1;
+  }
+
+  for(let slotStart = 0; slotStart < 24 * 60; slotStart += 30){
+    const slotEnd = slotStart + 30;
+    const overlaps = startMinutes < slotEnd && effectiveEndMinutes > slotStart;
+
+    if(overlaps){
+      covered.push(formatTimeLabelFromMinutes(slotStart));
+    }
+  }
+
+  return covered;
+}
+
+function renderHabitsInCalendar(){
+  const habits = getHabits();
+
+  if(habits.length === 0){
+    const row = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 8;
+    td.className = "empty-state";
+    td.textContent = "Todavía no hay tareas cargadas en el tracker.";
+    row.appendChild(td);
+    calendarBody.appendChild(row);
+    return;
+  }
+
+  habits.forEach(habit => {
+    const days = Array.isArray(habit.days) ? habit.days : [];
+    if(days.length === 0) return;
+
+    const timeData = getHabitTimeData(habit);
+    const hasTime = Boolean(timeData.start);
+    const coveredSlots = getCoveredTimeLabels(habit);
+
+    days.forEach(dayKey => {
+      const dayIndex = dayMap[dayKey];
+      if(dayIndex === undefined) return;
+
+      if(!hasTime){
+        addTaskToCell(dayIndex, "Sin hora", createTaskElement(habit, true));
+        return;
+      }
+
+      coveredSlots.forEach(slotLabel => {
+        addTaskToCell(dayIndex, slotLabel, createTaskElement(habit, false));
+      });
+    });
+  });
+}
+
+function renderCalendar(){
+  buildHeader();
+  buildBaseGrid();
+  renderHabitsInCalendar();
+}
+
+function changeWeek(offset){
+  currentDate.setDate(currentDate.getDate() + offset * 7);
+  renderCalendar();
+}
+
+function buildColorGrid(){
+  colorGrid.innerHTML = "";
+
+  colorOptions.forEach(color => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "color-swatch";
+    button.dataset.colorId = color.id;
+    button.style.background = `linear-gradient(180deg, ${color.start}, ${color.end})`;
+
+    button.addEventListener("click", () => {
+      selectedColorId = color.id;
+      updateActiveSwatch();
+      updatePreviewColor();
+    });
+
+    colorGrid.appendChild(button);
+  });
+}
+
+function updateActiveSwatch(){
+  colorGrid.querySelectorAll(".color-swatch").forEach(button => {
+    button.classList.toggle("active", button.dataset.colorId === selectedColorId);
+  });
+}
+
+function updatePreviewColor(){
+  const color = getColorById(selectedColorId || "red");
+  colorPreview.style.background = `linear-gradient(180deg, ${color.start}, ${color.end})`;
+}
+
+function openColorModal(habit){
+  selectedHabitId = habit.id || null;
+  selectedColorId = habit.color || "red";
+
+  colorPreviewText.textContent = typeof habit.text === "string" && habit.text.trim()
+    ? habit.text.trim()
+    : "Tarea";
+
+  colorPreviewTime.textContent = getHabitTimeData(habit).label || "Sin horario";
+  updateActiveSwatch();
+  updatePreviewColor();
+  colorModal.style.display = "flex";
+}
+
+function closeColorModal(){
+  colorModal.style.display = "none";
+  selectedHabitId = null;
+  selectedColorId = null;
+}
+
+function applySelectedColor(){
+  if(!selectedHabitId || !selectedColorId){
+    closeColorModal();
+    return;
+  }
+
+  const habits = getHabits().map(habit => {
+    if(habit.id === selectedHabitId){
+      return { ...habit, color: selectedColorId };
+    }
+    return habit;
+  });
+
+  saveHabits(habits);
+  closeColorModal();
+  renderCalendar();
+}
+
+document.getElementById("prevWeekBtn").addEventListener("click", () => changeWeek(-1));
+document.getElementById("nextWeekBtn").addEventListener("click", () => changeWeek(1));
+document.getElementById("cancelColorBtn").addEventListener("click", closeColorModal);
+document.getElementById("saveColorBtn").addEventListener("click", applySelectedColor);
+
+colorModal.addEventListener("click", (event) => {
+  if(event.target === colorModal){
+    closeColorModal();
+  }
+});
+
+window.addEventListener("storage", (event) => {
+  if(event.key === "habits"){
+    renderCalendar();
+  }
+});
+
+buildColorGrid();
+renderCalendar();
+</script>
+</body>
+</html>
