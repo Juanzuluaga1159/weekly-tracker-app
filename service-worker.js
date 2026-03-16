@@ -12,7 +12,7 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-const CACHE_NAME = "weekly-tracker-cache-v30";
+const CACHE_NAME = "weekly-tracker-cache-v31";
 
 const urlsToCache = [
   "./",
