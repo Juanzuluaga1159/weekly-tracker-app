@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#b91c1c" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <title>Configuración | Weekly Tracker</title>
+
+  <style>
+    :root {
+      --bg: #030303;
+      --bg-soft: #0b0b0b;
+      --card: rgba(255, 255, 255, 0.04);
+      --card-strong: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.09);
+      --border-red: rgba(220, 38, 38, 0.32);
+      --text: #f5f5f5;
+      --muted: #a1a1aa;
+      --primary: #dc2626;
+      --primary-dark: #991b1b;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --shadow: 0 20px 45px rgba(0, 0, 0, 0.45);
+      --radius-xl: 26px;
+      --radius-lg: 22px;
+      --radius-md: 18px;
+      --radius-sm: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      min-height: 100%;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(127, 0, 0, 0.26), transparent 26%),
+        radial-gradient(circle at bottom right, rgba(127, 0, 0, 0.18), transparent 24%),
+        linear-gradient(180deg, #050505 0%, #020202 100%);
+      padding: 20px 14px 30px;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, transparent 0%, rgba(220, 38, 38, 0.03) 50%, transparent 100%);
+      mix-blend-mode: screen;
+      opacity: 0.75;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 760px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .top-btn {
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.025));
+      color: var(--text);
+      border-radius: 16px;
+      padding: 12px 16px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: .22s ease;
+    }
+
+    .top-btn:hover {
+      transform: translateY(-1px);
+      border-color: var(--border-red);
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.025));
+      border-radius: var(--radius-xl);
+      padding: 24px 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top center, rgba(220, 38, 38, 0.12), transparent 38%);
+      pointer-events: none;
+    }
+
+    .hero-title {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      text-shadow: 0 0 18px rgba(220, 38, 38, 0.18);
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-subtitle {
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 0.98rem;
+      position: relative;
+      z-index: 1;
+      max-width: 620px;
+    }
+
+    .settings-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.025));
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .section-subtitle {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .badge {
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      color: #fca5a5;
+      border: 1px solid rgba(220, 38, 38, 0.25);
+      background: rgba(220, 38, 38, 0.08);
+      white-space: nowrap;
+    }
+
+    .setting-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .setting-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .setting-main {
+      min-width: 0;
+    }
+
+    .setting-title {
+      font-size: 0.98rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .setting-desc {
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.35;
+    }
+
+    .control-select,
+    .control-input {
+      min-width: 160px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(10, 10, 10, 0.9);
+      color: white;
+      border-radius: 14px;
+      padding: 12px 14px;
+      outline: none;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    .control-select:focus,
+    .control-input:focus {
+      border-color: rgba(220, 38, 38, 0.45);
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+    }
+
+    .switch {
+      position: relative;
+      width: 58px;
+      height: 34px;
+      display: inline-block;
+    }
+
+    .switch input {
+      display: none;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 999px;
+      transition: .22s ease;
+      cursor: pointer;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      left: 4px;
+      top: 4px;
+      border-radius: 50%;
+      background: white;
+      transition: .22s ease;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.3);
+    }
+
+    .switch input:checked + .slider {
+      background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+      border-color: rgba(220, 38, 38, 0.42);
+      box-shadow: 0 0 16px rgba(220, 38, 38, 0.18);
+    }
+
+    .switch input:checked + .slider::before {
+      transform: translateX(24px);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .action-btn {
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.025));
+      color: white;
+      border-radius: 16px;
+      padding: 13px 16px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: .22s ease;
+      box-shadow: var(--shadow);
+    }
+
+    .action-btn:hover {
+      transform: translateY(-1px);
+      border-color: var(--border-red);
+    }
+
+    .action-btn.danger {
+      border-color: rgba(239, 68, 68, 0.28);
+      background: linear-gradient(180deg, rgba(239,68,68,0.12), rgba(239,68,68,0.06));
+    }
+
+    .action-btn.success {
+      border-color: rgba(34, 197, 94, 0.28);
+      background: linear-gradient(180deg, rgba(34,197,94,0.12), rgba(34,197,94,0.06));
+    }
+
+    .status {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      display: none;
+    }
+
+    .status.show {
+      display: block;
+    }
+
+    .status.ok {
+      background: rgba(34, 197, 94, 0.1);
+      color: #bbf7d0;
+      border: 1px solid rgba(34, 197, 94, 0.22);
+    }
+
+    .status.warn {
+      background: rgba(245, 158, 11, 0.1);
+      color: #fde68a;
+      border: 1px solid rgba(245, 158, 11, 0.22);
+    }
+
+    .status.danger {
+      background: rgba(239, 68, 68, 0.1);
+      color: #fecaca;
+      border: 1px solid rgba(239, 68, 68, 0.22);
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      text-align: center;
+      color: rgba(255,255,255,0.38);
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 640px) {
+      .hero-title {
+        font-size: 1.7rem;
+      }
+
+      .setting-row {
+        grid-template-columns: 1fr;
+      }
+
+      .control-select,
+      .control-input {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .topbar {
+        flex-wrap: wrap;
+      }
+
+      .top-btn {
+        flex: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="topbar">
+      <button class="top-btn" onclick="goHome()">← <span data-i18n="backHome">Menú principal</span></button>
+      <button class="top-btn" onclick="saveSettings()">💾 <span data-i18n="save">Guardar</span></button>
+    </div>
+
+    <section class="hero">
+      <h1 class="hero-title" data-i18n="settingsTitle">Configuración</h1>
+      <p class="hero-subtitle" data-i18n="settingsSubtitle">
+        Personalizá la experiencia de la app, elegí idioma y ajustá preferencias generales sin perder la estética principal.
+      </p>
+    </section>
+
+    <div class="settings-grid">
+      <section class="card">
+        <div class="section-header">
+          <div>
+            <div class="section-title" data-i18n="generalSection">General</div>
+            <div class="section-subtitle" data-i18n="generalSectionDesc">Opciones básicas de uso diario.</div>
+          </div>
+          <div class="badge" data-i18n="recommended">Recomendado</div>
+        </div>
+
+        <div class="setting-list">
+          <div class="setting-row">
+            <div class="setting-main">
+              <div class="setting-title" data-i18n="languageTitle">Idioma</div>
+              <div class="setting-desc" data-i18n="languageDesc">Elegí el idioma principal de la interfaz.</div>
+            </div>
+            <select id="languageSelect" class="control-select">
+              <option value="es">Español</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-main">
+              <div class="setting-title" data-i18n="nameTitle">Nombre de perfil</div>
+              <div class="setting-desc" data-i18n="nameDesc">Se usa en la portada principal de la app.</div>
+            </div>
+            <input id="profileNameInput" class="control-input" type="text" maxlength="40" placeholder="Juan Zuluaga" />
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-main">
+              <div class="setting-title" data-i18n="weekStartTitle">Inicio de semana</div>
+              <div class="setting-desc" data-i18n="weekStartDesc">Configuración útil para organización y vistas futuras.</div>
+            </div>
+            <select id="weekStartSelect" class="control-select">
+              <option value="monday">Lunes</option>
+              <option value="sunday">Domingo</option>
+            </select>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-main">
+              <div class="setting-title" data-i18n="compactTitle">Modo compacto</div>
+              <div class="setting-desc" data-i18n="compactDesc">Reduce un poco los espacios visuales en pantallas chicas.</div>
+            </div>
+            <label class="switch">
+              <input id="compactModeToggle" type="checkbox" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-header">
+          <div>
+            <div class="section-title" data-i18n="behaviorSection">Comportamiento</div>
+            <div class="section-subtitle" data-i18n="behaviorSectionDesc">Preferencias típicas de una app de productividad.</div>
+          </div>
+        </div>
+
+        <div class="setting-list">
+          <div class="setting-row">
+            <div class="setting-main">
+              <div class="setting-title" data-i18n="confirmDeleteTitle">Confirmar antes de borrar</div>
+              <div class="setting-desc" data-i18n="confirmDeleteDesc">Evita eliminar tareas por error.</div>
+            </div>
+            <label class="switch">
+              <input id="confirmDeleteToggle" type="checkbox" />
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-main">
+              <div class="setting-title" data-i18n="animationsTitle">Animaciones suaves</div>
+              <div class="setting-desc" data-i18n="animationsDesc">Mantiene microtransiciones y feedback visual.</div>
+            </div>
+            <label class="switch">
+              <input id="animationsToggle" type="checkbox" />
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-main">
+              <div class="setting-title" data-i18n="remindersTitle">Recordatorios</div>
+              <div class="setting-desc" data-i18n="remindersDesc">Preferencia guardada para futuras notificaciones.</div>
+            </div>
+            <label class="switch">
+              <input id="remindersToggle" type="checkbox" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-header">
+          <div>
+            <div class="section-title" data-i18n="dataSection">Datos</div>
+            <div class="section-subtitle" data-i18n="dataSectionDesc">Acciones útiles para respaldar o reiniciar la app.</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="action-btn success" onclick="exportData()" data-i18n="exportData">Exportar datos</button>
+          <button class="action-btn" onclick="importData()" data-i18n="importData">Importar datos</button>
+          <button class="action-btn danger" onclick="resetAppData()" data-i18n="resetData">Restablecer app</button>
+        </div>
+
+        <input id="importFileInput" type="file" accept=".json,application/json" style="display:none" />
+      </section>
+    </div>
+
+    <div id="statusBox" class="status"></div>
+
+    <div class="footer-note" data-i18n="footerNote">
+      Tus preferencias se guardan localmente en este dispositivo.
+    </div>
+  </main>
+
+  <script>
+    const DEFAULT_SETTINGS = {
+      language: "es",
+      profileName: "Juan Zuluaga",
+      weekStart: "monday",
+      compactMode: false,
+      confirmDelete: true,
+      animations: true,
+      reminders: false
+    };
+
+    const translations = {
+      es: {
+        backHome: "Menú principal",
+        save: "Guardar",
+        settingsTitle: "Configuración",
+        settingsSubtitle: "Personalizá la experiencia de la app, elegí idioma y ajustá preferencias generales sin perder la estética principal.",
+        generalSection: "General",
+        generalSectionDesc: "Opciones básicas de uso diario.",
+        recommended: "Recomendado",
+        languageTitle: "Idioma",
+        languageDesc: "Elegí el idioma principal de la interfaz.",
+        nameTitle: "Nombre de perfil",
+        nameDesc: "Se usa en la portada principal de la app.",
+        weekStartTitle: "Inicio de semana",
+        weekStartDesc: "Configuración útil para organización y vistas futuras.",
+        compactTitle: "Modo compacto",
+        compactDesc: "Reduce un poco los espacios visuales en pantallas chicas.",
+        behaviorSection: "Comportamiento",
+        behaviorSectionDesc: "Preferencias típicas de una app de productividad.",
+        confirmDeleteTitle: "Confirmar antes de borrar",
+        confirmDeleteDesc: "Evita eliminar tareas por error.",
+        animationsTitle: "Animaciones suaves",
+        animationsDesc: "Mantiene microtransiciones y feedback visual.",
+        remindersTitle: "Recordatorios",
+        remindersDesc: "Preferencia guardada para futuras notificaciones.",
+        dataSection: "Datos",
+        dataSectionDesc: "Acciones útiles para respaldar o reiniciar la app.",
+        exportData: "Exportar datos",
+        importData: "Importar datos",
+        resetData: "Restablecer app",
+        footerNote: "Tus preferencias se guardan localmente en este dispositivo.",
+        savedOk: "Configuración guardada correctamente.",
+        exportedOk: "Tus datos se exportaron correctamente.",
+        importedOk: "Los datos se importaron correctamente.",
+        importError: "No se pudo importar el archivo. Revisá que sea un JSON válido.",
+        resetConfirm: "¿Seguro que querés borrar hábitos, progreso y configuración?",
+        resetOk: "La app fue restablecida correctamente.",
+        resetCancelled: "Acción cancelada.",
+        weekMonday: "Lunes",
+        weekSunday: "Domingo"
+      },
+      en: {
+        backHome: "Home",
+        save: "Save",
+        settingsTitle: "Settings",
+        settingsSubtitle: "Customize the app experience, choose a language and adjust general preferences while keeping the same visual identity.",
+        generalSection: "General",
+        generalSectionDesc: "Basic options for daily use.",
+        recommended: "Recommended",
+        languageTitle: "Language",
+        languageDesc: "Choose the main interface language.",
+        nameTitle: "Profile name",
+        nameDesc: "Used on the main home screen.",
+        weekStartTitle: "Start of week",
+        weekStartDesc: "Useful setting for organization and future views.",
+        compactTitle: "Compact mode",
+        compactDesc: "Reduces spacing slightly on smaller screens.",
+        behaviorSection: "Behavior",
+        behaviorSectionDesc: "Typical productivity app preferences.",
+        confirmDeleteTitle: "Confirm before deleting",
+        confirmDeleteDesc: "Helps prevent accidental task deletion.",
+        animationsTitle: "Smooth animations",
+        animationsDesc: "Keeps micro-interactions and visual feedback enabled.",
+        remindersTitle: "Reminders",
+        remindersDesc: "Saved preference for future notifications.",
+        dataSection: "Data",
+        dataSectionDesc: "Useful actions to back up or reset the app.",
+        exportData: "Export data",
+        importData: "Import data",
+        resetData: "Reset app",
+        footerNote: "Your preferences are stored locally on this device.",
+        savedOk: "Settings saved successfully.",
+        exportedOk: "Your data was exported successfully.",
+        importedOk: "Data imported successfully.",
+        importError: "The file could not be imported. Check that it is a valid JSON file.",
+        resetConfirm: "Are you sure you want to delete habits, progress and settings?",
+        resetOk: "The app was reset successfully.",
+        resetCancelled: "Action cancelled.",
+        weekMonday: "Monday",
+        weekSunday: "Sunday"
+      }
+    };
+
+    function getSettings() {
+      try {
+        const saved = JSON.parse(localStorage.getItem("appSettings")) || {};
+        return { ...DEFAULT_SETTINGS, ...saved };
+      } catch (error) {
+        return { ...DEFAULT_SETTINGS };
+      }
+    }
+
+    function saveSettingsToStorage(settings) {
+      localStorage.setItem("appSettings", JSON.stringify(settings));
+    }
+
+    function getCurrentLanguage() {
+      return getSettings().language || "es";
+    }
+
+    function t(key) {
+      const lang = getCurrentLanguage();
+      return (translations[lang] && translations[lang][key]) || translations.es[key] || key;
+    }
+
+    function showStatus(message, type = "ok") {
+      const box = document.getElementById("statusBox");
+      box.textContent = message;
+      box.className = `status show ${type}`;
+      clearTimeout(showStatus._timer);
+      showStatus._timer = setTimeout(() => {
+        box.className = "status";
+        box.textContent = "";
+      }, 2800);
+    }
+
+    function applyTranslations() {
+      const lang = getCurrentLanguage();
+
+      document.documentElement.lang = lang;
+
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        el.textContent = (translations[lang] && translations[lang][key]) || translations.es[key] || key;
+      });
+
+      const weekStartSelect = document.getElementById("weekStartSelect");
+      if (weekStartSelect) {
+        weekStartSelect.options[0].text = t("weekMonday");
+        weekStartSelect.options[1].text = t("weekSunday");
+      }
+
+      document.getElementById("profileNameInput").placeholder =
+        lang === "en" ? "Your name" : "Tu nombre";
+
+      document.title = lang === "en" ? "Settings | Weekly Tracker" : "Configuración | Weekly Tracker";
+    }
+
+    function loadSettingsIntoUI() {
+      const settings = getSettings();
+
+      document.getElementById("languageSelect").value = settings.language;
+      document.getElementById("profileNameInput").value = settings.profileName;
+      document.getElementById("weekStartSelect").value = settings.weekStart;
+      document.getElementById("compactModeToggle").checked = settings.compactMode;
+      document.getElementById("confirmDeleteToggle").checked = settings.confirmDelete;
+      document.getElementById("animationsToggle").checked = settings.animations;
+      document.getElementById("remindersToggle").checked = settings.reminders;
+
+      applyCompactMode(settings.compactMode);
+      applyTranslations();
+    }
+
+    function readSettingsFromUI() {
+      return {
+        language: document.getElementById("languageSelect").value,
+        profileName: document.getElementById("profileNameInput").value.trim() || DEFAULT_SETTINGS.profileName,
+        weekStart: document.getElementById("weekStartSelect").value,
+        compactMode: document.getElementById("compactModeToggle").checked,
+        confirmDelete: document.getElementById("confirmDeleteToggle").checked,
+        animations: document.getElementById("animationsToggle").checked,
+        reminders: document.getElementById("remindersToggle").checked
+      };
+    }
+
+    function saveSettings() {
+      const settings = readSettingsFromUI();
+      saveSettingsToStorage(settings);
+      applyCompactMode(settings.compactMode);
+      applyTranslations();
+      showStatus(t("savedOk"), "ok");
+    }
+
+    function applyCompactMode(enabled) {
+      document.body.style.setProperty("--radius-lg", enabled ? "18px" : "22px");
+      document.body.style.setProperty("--radius-xl", enabled ? "22px" : "26px");
+    }
+
+    function goHome() {
+      window.location.href = "index.html";
+    }
+
+    function exportData() {
+      const payload = {
+        appSettings: getSettings(),
+        habits: JSON.parse(localStorage.getItem("habits") || "[]"),
+        progress: JSON.parse(localStorage.getItem("progress") || "{}"),
+        exportedAt: new Date().toISOString()
+      };
+
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "weekly-tracker-backup.json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+
+      showStatus(t("exportedOk"), "ok");
+    }
+
+    function importData() {
+      document.getElementById("importFileInput").click();
+    }
+
+    function handleImportFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+
+          if (data.appSettings) {
+            localStorage.setItem("appSettings", JSON.stringify({
+              ...DEFAULT_SETTINGS,
+              ...data.appSettings
+            }));
+          }
+
+          if (Array.isArray(data.habits)) {
+            localStorage.setItem("habits", JSON.stringify(data.habits));
+          }
+
+          if (data.progress && typeof data.progress === "object") {
+            localStorage.setItem("progress", JSON.stringify(data.progress));
+          }
+
+          loadSettingsIntoUI();
+          showStatus(t("importedOk"), "ok");
+        } catch (error) {
+          showStatus(t("importError"), "danger");
+        } finally {
+          event.target.value = "";
+        }
+      };
+
+      reader.readAsText(file);
+    }
+
+    function resetAppData() {
+      const confirmed = confirm(t("resetConfirm"));
+      if (!confirmed) {
+        showStatus(t("resetCancelled"), "warn");
+        return;
+      }
+
+      localStorage.removeItem("habits");
+      localStorage.removeItem("progress");
+      localStorage.removeItem("appSettings");
+
+      loadSettingsIntoUI();
+      showStatus(t("resetOk"), "ok");
+    }
+
+    document.getElementById("languageSelect").addEventListener("change", function() {
+      const current = readSettingsFromUI();
+      saveSettingsToStorage(current);
+      applyTranslations();
+    });
+
+    document.getElementById("compactModeToggle").addEventListener("change", function(e) {
+      applyCompactMode(e.target.checked);
+    });
+
+    document.getElementById("importFileInput").addEventListener("change", handleImportFile);
+
+    window.addEventListener("DOMContentLoaded", loadSettingsIntoUI);
+  </script>
+</body>
+</html>
